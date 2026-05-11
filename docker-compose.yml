@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  # PostgreSQL база данных
+  db:
+    image: postgres:16-alpine  # Alpine версия меньше размером
+    container_name: fastapi_postgres
+    restart: unless-stopped     # Автоперезапуск при сбоях
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-fastapi_db}
+    ports:
+      - "5432:5432"             # Проброс порта
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Сохранение данных
+    healthcheck:                # Проверка здоровья контейнера
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Веб-интерфейс для управления БД
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: fastapi_pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@admin.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin}
+    ports:
+      - "5050:80"              # Доступ через браузер
+    depends_on:
+      - db
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+
+volumes:
+  postgres_data:               # Именованный volume для данных
+  pgadmin_data:                # Именованный volume для pgAdmin
