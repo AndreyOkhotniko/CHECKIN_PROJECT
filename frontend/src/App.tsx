@@ -12,12 +12,14 @@ function App() {
         <Route path="login" element={<h1>login</h1>}></Route>
         {/*Регистрация*/}
         <Route path="register" element={<h1>register</h1>}></Route>
-        {/*Список мест*/}
-        <Route path="places" element={<h1>places</h1>}></Route>
 
         {/* Subj Routes */}
         {/*Проверка роли*/}
         <Route element={<ProtectedRoute role="subj" />}>
+          {/*Список мест*/}
+          <Route path="places" element={<h1>places</h1>}></Route>
+          {/*Детали места*/}
+          <Route path="/places/:id" element={<h1>Detail place id</h1>}></Route>
           {/*Просмотр коллекции штампов*/}
           <Route path="collection" element={<h1>collection</h1>}></Route>
           {/*Профиль гостя*/}
