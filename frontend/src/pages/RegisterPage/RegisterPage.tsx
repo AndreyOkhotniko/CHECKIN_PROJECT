@@ -1,5 +1,5 @@
-function RolePage() {
+function RegisterPage() {
   return <></>;
 }
 
-export default RolePage;
+export default RegisterPage;

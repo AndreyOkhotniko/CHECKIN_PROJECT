@@ -1,17 +1,20 @@
 import { Routes, Route } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import RolePage from './pages/RolePage/RolePage';
+import LoginPage from './pages/LoginPage/LoginPage';
+import RegisterPage from './pages/RegisterPage/RegisterPage';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
         {/*Выбор роли*/}
-        <Route index element={<h1>role</h1>} />
+        <Route index element={<RolePage />} />
         {/*Авторизация*/}
-        <Route path="login" element={<h1>login</h1>}></Route>
+        <Route path="login" element={<LoginPage />}></Route>
         {/*Регистрация*/}
-        <Route path="register" element={<h1>register</h1>}></Route>
+        <Route path="register" element={<RegisterPage />}></Route>
 
         {/* Subj Routes */}
         {/*Проверка роли*/}
