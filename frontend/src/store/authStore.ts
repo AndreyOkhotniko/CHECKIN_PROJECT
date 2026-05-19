@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, devtools } from 'zustand/middleware';
 import type { UserType } from '@/types/UserType';
 
 interface AuthStore {
@@ -11,27 +11,30 @@ interface AuthStore {
 }
 
 const useAuthStore = create<AuthStore>()(
-  persist(
-    (set) => {
-      return {
-        user: null,
-        //role: null,
-        accessToken: null,
-        login: (candidate, token) => {
-          set(() => ({ user: candidate, accessToken: token }));
-        },
-        logout: () => {
-          set(() => ({ user: null, accessToken: null }));
-        },
-      };
-    },
-    {
-      name: 'auth',
-      partialize: (state) => ({
-        user: state.user,
-        //role: state.role,
-      }),
-    },
+  devtools(
+    persist(
+      (set) => {
+        return {
+          user: null,
+          //role: null,
+          accessToken: null,
+          login: (candidate, token) => {
+            set(() => ({ user: candidate, accessToken: token }));
+          },
+          logout: () => {
+            set(() => ({ user: null, accessToken: null }));
+          },
+        };
+      },
+      {
+        name: 'auth',
+        partialize: (state) => ({
+          user: state.user,
+          //role: state.role,
+        }),
+      },
+    ),
+    { name: 'AuthStore' },
   ),
 );
 
