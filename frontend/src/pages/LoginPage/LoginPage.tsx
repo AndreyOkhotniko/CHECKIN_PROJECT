@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { schema, type TypeForm } from './schema';
@@ -9,9 +9,16 @@ function LoginPage() {
     resolver: zodResolver(schema),
     mode: 'onBlur',
   });
+  const navigate = useNavigate();
+  const role = useLocation().state?.role || null;
+
+  if (role === null) {
+    navigate('/');
+  }
 
   const onSubmit = (data: TypeForm) => {
     console.log(data);
+    console.log(role);
   };
 
   return (
