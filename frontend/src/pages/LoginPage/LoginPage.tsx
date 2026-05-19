@@ -1,11 +1,10 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { schema, type TypeForm } from './schema';
 
 import s from './LoginPage.module.css';
 function LoginPage() {
-  const navigate = useNavigate();
   const { register, handleSubmit, formState } = useForm<TypeForm>({
     resolver: zodResolver(schema),
     mode: 'onBlur',
