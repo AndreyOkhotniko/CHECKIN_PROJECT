@@ -47,6 +47,8 @@ function App() {
           {/*Просмотр qr кода места*/}
           <Route path="my-places/:id/qr" element={<h1>my-places/:id/qr</h1>}></Route>
         </Route>
+
+        <Route path="*" element={<h1>Страница не найдена!</h1>} />
       </Route>
     </Routes>
   );
