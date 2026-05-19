@@ -10,7 +10,7 @@ interface AuthStore {
   logout: () => void;
 }
 
-const authStore = create<AuthStore>()(
+const useAuthStore = create<AuthStore>()(
   persist(
     (set) => {
       return {
@@ -35,4 +35,4 @@ const authStore = create<AuthStore>()(
   ),
 );
 
-export default authStore;
+export default useAuthStore;
