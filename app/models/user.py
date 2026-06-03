@@ -1,34 +1,29 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Table
-from sqlalchemy.sql import func
-from app.db.base import Base
+from sqlmodel import SQLModel, Field, Relationship
+from typing import Optional, List
+from datetime import datetime
+from enum import Enum
 
-class User(Base):
-    """
-    Модель пользователя (SQLAlchemy ORM).
-    
-    Описывает структуру таблицы 'users' в БД.
-    """
+class UserRole(str, Enum):
+    SUBJ = "subj"  # обычный пользователь
+    OBJ = "obj"    # владелец места
+
+class User(SQLModel, table=True):
     __tablename__ = "users"
     
-    # Первичный ключ
-    id = Column(Integer, primary_key=True, index=True)
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(max_length=100, nullable=False)
+    email: str = Field(max_length=255, unique=True, nullable=False, index=True)
+    phone: Optional[str] = Field(default=None, max_length=50)
+    password: str = Field(max_length=255, nullable=False)  # хранить хеш!
+    role: UserRole = Field(default=UserRole.SUBJ)
+    avatar: Optional[str] = Field(default=None)
+    is_active: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(
+        default_factory=datetime.utcnow,
+        sa_column_kwargs={"onupdate": datetime.utcnow}
+    )
     
-    # Уникальные поля с индексами для быстрого поиска
-    email = Column(String(255), unique=True, index=True, nullable=False)
-    username = Column(String(50), unique=True, index=True, nullable=False)
-    
-    # Основная информация
-    full_name = Column(String(100))
-    hashed_password = Column(String(255), nullable=False)
-    
-    # Статус пользователя
-    is_active = Column(Boolean, default=True)
-    is_superuser = Column(Boolean, default=False)
-    
-    # Временные метки
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    
-    def __repr__(self):
-        """Строковое представление для отладки"""
-        return f"<User {self.username}>"
+    # Связи (будет работать после создания других моделей)
+    places: List["Place"] = Relationship(back_populates="owner")
+    stamps: List["Stamp"] = Relationship(back_populates="user")

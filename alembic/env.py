@@ -1,11 +1,16 @@
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
+import sys
+from pathlib import Path
+
+# Добавляем путь к приложению (если нужно)
+sys.path.append(str(Path(__file__).parent.parent))
 
 # Импорт моделей для автогенерации миграций
 from app.db.base import Base
 from app.core.config import settings
-from app.models.user import User  # Импорт всех моделей
+from app.models import User, Place, Stamp  # Импортируем ВСЕ модели
 
 # Конфигурация Alembic
 config = context.config
@@ -14,19 +19,14 @@ config = context.config
 config.set_main_option("sqlalchemy.url", settings.SYNC_DATABASE_URL)
 
 # Настройка логирования
-if config.config_file_name is not None:
+if config.config_name is not None:
     fileConfig(config.config_file_name)
 
 # Метаданные всех моделей
 target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
-    """
-    Запуск миграций в офлайн-режиме.
-    
-    Генерирует SQL без подключения к БД.
-    Используется для создания скриптов миграций.
-    """
+    """Запуск миграций в офлайн-режиме"""
     url = config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
@@ -39,11 +39,7 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 def run_migrations_online() -> None:
-    """
-    Запуск миграций в онлайн-режиме.
-    
-    Подключается к БД и применяет миграции.
-    """
+    """Запуск миграций в онлайн-режиме"""
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

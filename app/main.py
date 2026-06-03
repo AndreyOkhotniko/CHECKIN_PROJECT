@@ -1,7 +1,8 @@
 from fastapi import FastAPI
 from app.core.config import settings
 from app.db.session import engine
-from app.db.base import Base
+from app.db.base import BaseModel
+from app.models import User, Place, Stamp  # Добавьте эту строку
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -10,11 +11,11 @@ app = FastAPI(
 
 @app.on_event("startup")
 async def startup():
-    # Создание таблиц (только для разработки, в продакшене используйте миграции)
-    async with engine.begin() as conn:
-        # Для разработки можно раскомментировать
-        # await conn.run_sync(Base.metadata.create_all)
-        pass
+    # В разработке можно создать таблицы (но лучше через миграции)
+    # Раскомментируйте для быстрого старта:
+    # async with engine.begin() as conn:
+    #     await conn.run_sync(Base.metadata.create_all)
+    pass
 
 @app.on_event("shutdown")
 async def shutdown():
@@ -31,7 +32,6 @@ async def root():
 @app.get("/health")
 async def health_check():
     try:
-        # Простая проверка подключения к БД
         async with engine.connect() as conn:
             await conn.execute("SELECT 1")
         return {"status": "healthy", "database": "connected"}

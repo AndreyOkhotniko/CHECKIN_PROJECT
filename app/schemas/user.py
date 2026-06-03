@@ -1,55 +1,32 @@
 from pydantic import BaseModel, EmailStr, Field
-from datetime import datetime
 from typing import Optional
+from datetime import datetime
+from app.models.user import UserRole
 
 class UserBase(BaseModel):
-    """
-    Базовая схема пользователя.
-    
-    Содержит общие поля для всех схем пользователя.
-    """
+    name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
-    username: str = Field(..., min_length=3, max_length=50)
-    full_name: Optional[str] = Field(None, max_length=100)
-    is_active: Optional[bool] = True
+    phone: Optional[str] = Field(None, max_length=50)
+    role: UserRole = UserRole.SUBJ
+    avatar: Optional[str] = None
 
 class UserCreate(UserBase):
-    """
-    Схема для создания пользователя.
-    
-    Включает пароль, который не возвращается в ответах API.
-    """
-    password: str = Field(..., min_length=8, max_length=100)
+    password: str = Field(..., min_length=6)
 
 class UserUpdate(BaseModel):
-    """
-    Схема для обновления пользователя.
-    
-    Все поля опциональны - обновляются только переданные.
-    """
-    email: Optional[EmailStr] = None
-    username: Optional[str] = Field(None, min_length=3, max_length=50)
-    full_name: Optional[str] = None
-    password: Optional[str] = Field(None, min_length=8)
-    is_active: Optional[bool] = None
+    name: Optional[str] = Field(None, min_length=1, max_length=100)
+    phone: Optional[str] = Field(None, max_length=50)
+    avatar: Optional[str] = None
+    password: Optional[str] = Field(None, min_length=6)
 
-class UserResponse(UserBase):
-    """
-    Схема для ответа API.
-    
-    Включает все поля кроме пароля.
-    """
+class UserInDB(UserBase):
     id: int
+    is_active: bool
     created_at: datetime
-    updated_at: Optional[datetime] = None
+    updated_at: datetime
     
     class Config:
-        from_attributes = True  # Позволяет создавать схему из ORM объекта
+        from_attributes = True  # for Pydantic v2 (было orm_mode)
 
-class UserInDB(UserResponse):
-    """
-    Внутренняя схема (для базы данных).
-    
-    Включает хеш пароля (никогда не возвращается в API).
-    """
-    hashed_password: str
+class UserResponse(UserInDB):
+    pass
