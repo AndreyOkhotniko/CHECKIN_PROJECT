@@ -1,38 +1,32 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from app.core.config import settings
 
 # Создание асинхронного движка БД
 engine = create_async_engine(
     settings.DATABASE_URL,
-    echo=settings.DEBUG,        # Логирование SQL запросов при DEBUG=True
-    future=True,                # Использование нового стиля SQLAlchemy 2.0
-    pool_size=20,               # Размер пула соединений
-    max_overflow=10             # Максимальное количество дополнительных соединений
+    echo=settings.DEBUG,
+    future=True,
+    pool_size=20,
+    max_overflow=10,
+    pool_pre_ping=True,  # Проверка соединений перед использованием
 )
 
-# Фабрика сессий
-async_session = sessionmaker(
+# Фабрика асинхронных сессий
+async_session_maker = async_sessionmaker(
     engine,
-    class_=AsyncSession,        # Асинхронные сессии
-    expire_on_commit=False      # Объекты остаются доступными после коммита
+    class_=AsyncSession,
+    expire_on_commit=False,
+    autoflush=False,
+    autocommit=False,
 )
 
-async def get_db() -> AsyncSession:
-    """
-    Зависимость FastAPI для получения сессии БД.
-    
-    Автоматически управляет:
-    - Созданием сессии
-    - Коммитом/откатом транзакций
-    - Закрытием сессии
-    """
-    async with async_session() as session:
+async def get_db():
+    """Асинхронная зависимость для получения DB сессии"""
+    async with async_session_maker() as session:
         try:
             yield session
-            await session.commit()      # Автоматический коммит при успехе
         except Exception:
-            await session.rollback()    # Автоматический откат при ошибке
-            raise                       # Проброс исключения дальше
+            await session.rollback()
+            raise
         finally:
-            await session.close()       # Гарантированное закрытие
+            await session.close()

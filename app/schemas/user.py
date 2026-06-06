@@ -2,54 +2,49 @@ from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional
 
+
 class UserBase(BaseModel):
-    """
-    Базовая схема пользователя.
-    
-    Содержит общие поля для всех схем пользователя.
-    """
+    """Базовая схема пользователя."""
+    name: str = Field(..., min_length=1, max_length=100)
     email: EmailStr
-    username: str = Field(..., min_length=3, max_length=50)
-    full_name: Optional[str] = Field(None, max_length=100)
-    is_active: Optional[bool] = True
+    phone: Optional[str] = None
+    role: str = Field(default="subj")  # subj или obj
+
 
 class UserCreate(UserBase):
-    """
-    Схема для создания пользователя.
-    
-    Включает пароль, который не возвращается в ответах API.
-    """
-    password: str = Field(..., min_length=8, max_length=100)
+    """Схема для регистрации."""
+    password: str = Field(..., min_length=6, max_length=100)
+
 
 class UserUpdate(BaseModel):
-    """
-    Схема для обновления пользователя.
-    
-    Все поля опциональны - обновляются только переданные.
-    """
-    email: Optional[EmailStr] = None
-    username: Optional[str] = Field(None, min_length=3, max_length=50)
-    full_name: Optional[str] = None
-    password: Optional[str] = Field(None, min_length=8)
-    is_active: Optional[bool] = None
+    """Схема для обновления профиля."""
+    name: Optional[str] = None
+    phone: Optional[str] = None
 
-class UserResponse(UserBase):
-    """
-    Схема для ответа API.
-    
-    Включает все поля кроме пароля.
-    """
+
+class UserResponse(BaseModel):
+    """Ответ с информацией пользователя."""
     id: int
+    name: str
+    email: str
+    phone: Optional[str]
+    role: str
+    referred_by: Optional[int]
+    stamps_count: int
+    is_active: bool
     created_at: datetime
-    updated_at: Optional[datetime] = None
     
     class Config:
-        from_attributes = True  # Позволяет создавать схему из ORM объекта
+        from_attributes = True
 
-class UserInDB(UserResponse):
-    """
-    Внутренняя схема (для базы данных).
-    
-    Включает хеш пароля (никогда не возвращается в API).
-    """
-    hashed_password: str
+
+class TokenResponse(BaseModel):
+    """Ответ при входе с токенами."""
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class TokenRefresh(BaseModel):
+    """Запрос на обновление токена."""
+    refresh: str

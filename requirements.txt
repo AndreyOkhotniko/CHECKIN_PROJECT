@@ -4,14 +4,14 @@ uvicorn[standard]==0.24.0
 
 # Работа с БД
 sqlalchemy==2.0.23        # ORM для Python
-psycopg2-binary==2.9.9    # Драйвер PostgreSQL
-asyncpg==0.29.0           # Асинхронный драйвер PostgreSQL
+asyncpg==0.30.0           # Асинхронный драйвер PostgreSQL
 alembic==1.13.0           # Миграции БД
 
 # Валидация данных
 pydantic==2.5.0           # Валидация данных для FastAPI
 pydantic-settings==2.1.0  # Настройки из переменных окружения
 python-dotenv==1.0.0      # Загрузка .env файлов
+email-validator==2.3.0    # Валидация email для Pydantic
 
 # Безопасность
 python-jose[cryptography]==3.3.0  # JWT токены

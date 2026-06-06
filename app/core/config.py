@@ -1,4 +1,5 @@
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from typing import Optional
 
 class Settings(BaseSettings):
@@ -10,6 +11,12 @@ class Settings(BaseSettings):
     2. .env файла
     3. Значений по умолчанию (в порядке приоритета)
     """
+    
+    model_config = ConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        extra='ignore'  # Игнорировать дополнительные поля из .env
+    )
     
     # Основные настройки проекта
     PROJECT_NAME: str = "FastAPI Project"
@@ -24,6 +31,10 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = "fastapi_db"
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: str = "5432"
+    
+    # Админ-панель PgAdmin
+    PGADMIN_EMAIL: str = "admin@admin.com"
+    PGADMIN_PASSWORD: str = "admin"
     
     @property
     def DATABASE_URL(self) -> str:
@@ -50,10 +61,6 @@ class Settings(BaseSettings):
             f"{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:"
             f"{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
-    
-    class Config:
-        env_file = ".env"      # Файл с переменными окружения
-        case_sensitive = True  # Чувствительность к регистру
 
 # Синглтон с настройками
 settings = Settings()

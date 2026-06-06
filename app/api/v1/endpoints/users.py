@@ -1,56 +1,48 @@
-"Пример эндпоинта с БД"
-from fastapi import APIRouter, Depends, HTTPException
+import uuid
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, UserInDB
+from app.schemas.user import UserResponse, UserUpdate
+from app.api.dependencies import get_current_user
 
-router = APIRouter()
+router = APIRouter(prefix="/api/users", tags=["users"])
 
-@router.post("/users/", response_model=UserInDB)
-async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
-    # Проверка существования пользователя
-    result = await db.execute(
-        select(User).where(User.email == user.email)
-    )
-    if result.scalar_one_or_none():
-        raise HTTPException(
-            status_code=400,
-            detail="Email already registered"
-        )
-    
-    # В реальном проекте здесь должно быть хеширование пароля
-    db_user = User(
-        email=user.email,
-        username=user.username,
-        full_name=user.full_name,
-        hashed_password=user.password  # Временно, нужно хешировать!
-    )
-    
-    db.add(db_user)
-    await db.commit()
-    await db.refresh(db_user)
-    return db_user
 
-@router.get("/users/", response_model=list[UserInDB])
-async def get_users(
-    skip: int = 0, 
-    limit: int = 100, 
+@router.get("/me/", response_model=UserResponse)
+async def get_current_user_profile(
+    current_user: User = Depends(get_current_user)
+):
+    """Получить профиль текущего пользователя."""
+    return UserResponse.model_validate(current_user)
+
+
+@router.put("/me/", response_model=UserResponse)
+async def update_user_profile(
+    user_update: UserUpdate,
+    current_user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
-    result = await db.execute(
-        select(User).offset(skip).limit(limit)
-    )
-    users = result.scalars().all()
-    return users
+    """Обновить профиль пользователя."""
+    if user_update.name:
+        current_user.name = user_update.name
+    if user_update.phone:
+        current_user.phone = user_update.phone
+    
+    db.add(current_user)
+    await db.commit()
+    await db.refresh(current_user)
+    
+    return UserResponse.model_validate(current_user)
 
-@router.get("/users/{user_id}", response_model=UserInDB)
-async def get_user(user_id: int, db: AsyncSession = Depends(get_db)):
-    result = await db.execute(
-        select(User).where(User.id == user_id)
-    )
-    user = result.scalar_one_or_none()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+
+@router.get("/referral_link/")
+async def get_referral_link(
+    current_user: User = Depends(get_current_user)
+):
+    """Получить реферальную ссылку текущего пользователя."""
+    return {
+        "referral_code": str(current_user.id),
+        "referral_link": f"https://yourapp.com/register?ref={current_user.id}"
+    }
