@@ -4,25 +4,27 @@ import Layout from './components/Layout';
 import RolePage from './pages/RolePage/RolePage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
+import PlaceListPage from './pages/PlaceListPage/PlaceListPage';
+import PlaceDetailPage from './pages/PlaceDetailPage/PlaceDetailPage';
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
+        {/*Список мест*/}
+        <Route index element={<PlaceListPage />} />
         {/*Выбор роли*/}
-        <Route index element={<RolePage />} />
+        <Route path="roles" element={<RolePage />} />
         {/*Авторизация*/}
-        <Route path="login" element={<LoginPage />}></Route>
+        <Route path="login" element={<LoginPage />} />
         {/*Регистрация*/}
-        <Route path="register" element={<RegisterPage />}></Route>
+        <Route path="register" element={<RegisterPage />} />
+        {/*Детали места*/}
+        <Route path="/places/:id" element={<PlaceDetailPage />} />
 
         {/* Subj Routes */}
         {/*Проверка роли*/}
         <Route element={<ProtectedRoute role="subj" />}>
-          {/*Список мест*/}
-          <Route path="places" element={<h1>places</h1>}></Route>
-          {/*Детали места*/}
-          <Route path="/places/:id" element={<h1>Detail place id</h1>}></Route>
           {/*Просмотр коллекции штампов*/}
           <Route path="collection" element={<h1>collection</h1>}></Route>
           {/*Профиль гостя*/}

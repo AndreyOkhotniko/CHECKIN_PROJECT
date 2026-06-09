@@ -1,0 +1,8 @@
+# Obsidian vault — пока полностью личный
+docs/
+CLAUDE.md
+desktop.ini
+# Когда vault станет общим, закомментируйте строку выше
+# и раскомментируйте эти две строки ниже:
+# docs/personal-*/
+# docs/.obsidian/workspace*.json

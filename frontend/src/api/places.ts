@@ -1,6 +1,22 @@
-import api from '@/lib/apiClient';
+//import api from '@/lib/apiClient';
+import { PLACES_MOCK } from '@/mocks/places.mock';
 
-export const getPlaces = async (count: number) => {
-  const response = await api.post('/places', { count });
+export const getPlaces = async () => {
+  //const response = await api.get('/places');
+  const response = await Promise.resolve({
+    data: PLACES_MOCK,
+  });
+
+  return response.data;
+};
+
+export const getPlaceById = async (id: number | undefined) => {
+  if (id === undefined) {
+    throw new Error('Id not valid');
+  }
+  const response = await Promise.resolve({
+    data: PLACES_MOCK.find((place) => place.id === id),
+  });
+
   return response.data;
 };

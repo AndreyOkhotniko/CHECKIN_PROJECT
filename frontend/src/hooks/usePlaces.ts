@@ -1,13 +1,15 @@
-import { getPlaces } from '@/api/places';
+import { getPlaceById, getPlaces } from '@/api/places';
 import { useQuery } from '@tanstack/react-query';
 
-function UsePlaces() {
-  const { data, isLoading, isError, error } = useQuery({
+export const usePlaces = () =>
+  useQuery({
     queryKey: ['places'],
-    queryFn: () => {
-      getPlaces(10);
-    },
+    queryFn: getPlaces,
   });
-}
 
-export default UsePlaces;
+export const usePlaceById = (id: number | undefined) =>
+  useQuery({
+    queryKey: ['place', id],
+    queryFn: () => getPlaceById(id),
+    enabled: id !== undefined && !isNaN(id),
+  });

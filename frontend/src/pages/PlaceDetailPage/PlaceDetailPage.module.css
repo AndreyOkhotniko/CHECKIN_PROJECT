@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+.page *,
+.page *::before,
+.page *::after {
+  box-sizing: border-box;
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: #fff;
+  font-family: 'Space Mono', monospace;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.header {
+  padding: 12px 16px 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.backLink {
+  font-size: 11px;
+  color: #555;
+  text-decoration: none;
+  font-family: 'Space Mono', monospace;
+}
+
+.backLink:hover {
+  color: #222;
+}
+
+/* ── Scroll area ── */
+.scrollArea {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scrollArea::-webkit-scrollbar {
+  display: none;
+}
+
+.content {
+  padding: 14px 16px 24px;
+}
+
+/* ── Detail image ── */
+.detailImg {
+  width: 100%;
+  height: 130px;
+  background: #e0e0e0;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #bbb;
+  border: 1.5px solid #ddd;
+  margin-bottom: 12px;
+}
+
+/* ── Place info ── */
+.placeName {
+  font-family: 'Caveat', cursive;
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.placeMeta {
+  font-size: 11px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.placeDescription {
+  font-size: 10px;
+  color: #777;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+/* ── Buttons ── */
+.btnPrimary {
+  display: block;
+  width: 100%;
+  padding: 11px;
+  background: #333;
+  color: #fff;
+  border: 2px solid #333;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s;
+  margin-bottom: 10px;
+}
+
+.btnPrimary:active {
+  opacity: 0.7;
+}
+
+.btnPrimaryDisabled {
+  composes: btnPrimary;
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.btnSecondary {
+  display: block;
+  width: 100%;
+  padding: 11px;
+  background: #fff;
+  color: #555;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  font-weight: 400;
+  text-align: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.1s;
+}
+
+.btnSecondary:active {
+  opacity: 0.7;
+}
+
+/* ── Stamp status ── */
+.stampStatus {
+  font-size: 10px;
+  color: #555;
+  border: 1.5px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  width: 100%;
+  text-align: center;
+}
+
+/* ── Bottom nav ── */
+.bottomNav {
+  border-top: 1.5px solid #ddd;
+  background: #fafafa;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.bnItem {
+  flex: 1;
+  padding: 9px 4px 11px;
+  text-align: center;
+  font-size: 9px;
+  color: #bbb;
+  cursor: pointer;
+  border-top: 2px solid transparent;
+  margin-top: -1.5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-family: 'Space Mono', monospace;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bnItemActive {
+  color: #222;
+  border-top-color: #333;
+  font-weight: 700;
+}
+
+.bnIconSq {
+  width: 18px;
+  height: 12px;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+}
+
+.bnIconStar {
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+.bnIconDot {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
