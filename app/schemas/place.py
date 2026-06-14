@@ -34,18 +34,31 @@ class PlaceUpdate(BaseModel):
     category_id: Optional[int] = None
 
 
-class PlaceResponse(PlaceBase):
-    """Ответ с информацией о месте."""
+class PlacePublicResponse(PlaceBase):
+    """
+    Публичный ответ о месте (без qr_code!).
+
+    Используется в открытых эндпоинтах. QR-код намеренно НЕ отдаётся, иначе
+    любой пользователь мог бы поставить штамп, не посещая место физически.
+    """
     id: int
     owner_id: int
-    qr_code: str
     stamp_url: Optional[str]
     is_active: bool
     created_at: datetime
-    category: Optional[CategoryResponse]
-    
+    category: Optional[CategoryResponse] = None
+
     class Config:
         from_attributes = True
+
+
+class PlaceResponse(PlacePublicResponse):
+    """
+    Полный ответ о месте, включая qr_code.
+
+    Возвращается только владельцу места (создание, /my, обновление).
+    """
+    qr_code: str
 
 
 class PlaceStatsResponse(BaseModel):

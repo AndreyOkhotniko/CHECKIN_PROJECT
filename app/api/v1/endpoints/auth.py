@@ -1,11 +1,11 @@
-import uuid
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.user import UserCreate, TokenResponse, TokenRefresh
+from app.schemas.user import UserCreate, LoginRequest, TokenResponse, TokenRefresh
 from app.core.security import hash_password, verify_password, create_access_token, create_refresh_token, verify_token
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -14,28 +14,29 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 @router.post("/register/", response_model=TokenResponse)
 async def register(
     user_data: UserCreate,
-    ref: str = None,
+    ref: Optional[int] = None,
     db: AsyncSession = Depends(get_db)
 ):
     """
     Регистрация нового пользователя.
-    
-    Query параметр `ref` - код реферала (опционально).
+
+    Query параметр `ref` - ID пригласившего пользователя (опционально).
+    FastAPI сам валидирует, что ref — целое число (нечисловое значение → 422).
     """
     # Проверяем, есть ли уже пользователь с таким email
     result = await db.execute(select(User).where(User.email == user_data.email))
     existing_user = result.scalar_one_or_none()
-    
+
     if existing_user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email уже зарегистрирован"
         )
-    
+
     # Ищем пользователя по реферальному коду
     referred_by = None
-    if ref:
-        result = await db.execute(select(User).where(User.id == int(ref)))
+    if ref is not None:
+        result = await db.execute(select(User).where(User.id == ref))
         referred_user = result.scalar_one_or_none()
         if referred_user:
             referred_by = referred_user.id
@@ -67,15 +68,14 @@ async def register(
 
 @router.post("/login/", response_model=TokenResponse)
 async def login(
-    email: str,
-    password: str,
+    credentials: LoginRequest,
     db: AsyncSession = Depends(get_db)
 ):
-    """Вход пользователя (получение JWT)."""
-    result = await db.execute(select(User).where(User.email == email))
+    """Вход пользователя (получение JWT). Учётные данные принимаются в теле запроса."""
+    result = await db.execute(select(User).where(User.email == credentials.email))
     user = result.scalar_one_or_none()
-    
-    if not user or not verify_password(password, user.hashed_password):
+
+    if not user or not verify_password(credentials.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Неправильный email или пароль"

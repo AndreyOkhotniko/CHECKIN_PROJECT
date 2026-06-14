@@ -7,7 +7,8 @@ from app.db.session import get_db
 from app.models.user import User
 from app.models.user import Place, Stamp
 from app.schemas.place import (
-    PlaceCreate, PlaceUpdate, PlaceResponse, PlaceStatsResponse, PlaceQRResponse
+    PlaceCreate, PlaceUpdate, PlaceResponse, PlacePublicResponse,
+    PlaceStatsResponse, PlaceQRResponse
 )
 from app.api.dependencies import get_current_user
 
@@ -72,46 +73,46 @@ async def get_my_places(
     return [PlaceResponse.model_validate(place) for place in places]
 
 
-@router.get("/", response_model=list[PlaceResponse])
+@router.get("/", response_model=list[PlacePublicResponse])
 async def get_public_places(
     search: str = None,
     category: int = None,
     db: AsyncSession = Depends(get_db)
 ):
-    """Получить публичный список активных мест."""
-    query = select(Place).where(Place.is_active == True)
-    
+    """Получить публичный список активных мест (без QR-кодов)."""
+    query = select(Place).where(Place.is_active.is_(True))
+
     if search:
         query = query.where(
             (Place.name.ilike(f"%{search}%")) |
             (Place.description.ilike(f"%{search}%"))
         )
-    
+
     if category:
         query = query.where(Place.category_id == category)
-    
+
     result = await db.execute(query)
     places = result.scalars().all()
-    
-    return [PlaceResponse.model_validate(place) for place in places]
+
+    return [PlacePublicResponse.model_validate(place) for place in places]
 
 
-@router.get("/{place_id}/", response_model=PlaceResponse)
+@router.get("/{place_id}/", response_model=PlacePublicResponse)
 async def get_place(
     place_id: int,
     db: AsyncSession = Depends(get_db)
 ):
-    """Получить детали конкретного места."""
+    """Получить детали конкретного места (публично, без QR-кода)."""
     result = await db.execute(select(Place).where(Place.id == place_id))
     place = result.scalar_one_or_none()
-    
+
     if not place:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Место не найдено"
         )
-    
-    return PlaceResponse.model_validate(place)
+
+    return PlacePublicResponse.model_validate(place)
 
 
 @router.put("/{place_id}/", response_model=PlaceResponse)

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from datetime import datetime, timezone
 
 from app.db.session import get_db
@@ -205,26 +206,29 @@ async def offline_sync(
     """Пакетная отправка чек-инов, сделанных без интернета."""
     successful = []
     errors = []
-    
+    seen_place_ids = set()  # дедуп дублей внутри одного пакета
+
     for item in request.items:
         qr_code = item.get("qr_code")
         scanned_at = item.get("scanned_at")
-        
+
         try:
             # Ищем место по QR-коду
             result = await db.execute(
                 select(Place).where(Place.qr_code == qr_code)
             )
             place = result.scalar_one_or_none()
-            
+
             if not place:
-                errors.append({
-                    "qr_code": qr_code,
-                    "error": "QR-код не найден"
-                })
+                errors.append({"qr_code": qr_code, "error": "QR-код не найден"})
                 continue
-            
-            # Проверяем, есть ли уже штамп
+
+            # Дубль в пределах этого же пакета
+            if place.id in seen_place_ids:
+                errors.append({"qr_code": qr_code, "error": "Дубликат в пакете"})
+                continue
+
+            # Проверяем, есть ли уже штамп в БД
             result = await db.execute(
                 select(Stamp).where(
                     (Stamp.user_id == current_user.id) &
@@ -232,36 +236,36 @@ async def offline_sync(
                 )
             )
             if result.scalar_one_or_none():
-                errors.append({
-                    "qr_code": qr_code,
-                    "error": "Штамп уже существует"
-                })
+                errors.append({"qr_code": qr_code, "error": "Штамп уже существует"})
                 continue
-            
-            # Создаем штамп
+
             new_stamp = Stamp(
                 user_id=current_user.id,
                 place_id=place.id,
                 scanned_at=datetime.fromisoformat(scanned_at) if isinstance(scanned_at, str) else scanned_at
             )
-            
+
+            # Сохраняем элемент в собственном savepoint: ошибка одного штампа
+            # (например, гонка с уникальным ограничением) не рушит весь пакет.
+            async with db.begin_nested():
+                db.add(new_stamp)
+                await db.flush()
+
             current_user.stamps_count += 1
-            db.add(new_stamp)
-            
+            seen_place_ids.add(place.id)
             successful.append({
                 "qr_code": qr_code,
                 "place_id": place.id,
                 "place_name": place.name
             })
-        
+
+        except IntegrityError:
+            errors.append({"qr_code": qr_code, "error": "Штамп уже существует"})
         except Exception as e:
-            errors.append({
-                "qr_code": qr_code,
-                "error": str(e)
-            })
-    
+            errors.append({"qr_code": qr_code, "error": str(e)})
+
     await db.commit()
-    
+
     return StampOfflineSyncResponse(
         successful=successful,
         errors=errors

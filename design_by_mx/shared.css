@@ -1,0 +1,107 @@
+/* Чекин — Shared Styles */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',-apple-system,sans-serif;
+  background:#13100E;
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:28px 16px;gap:18px;
+}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scanLine{
+  0%{transform:translateY(-46px);opacity:0}
+  10%{opacity:1}90%{opacity:1}
+  100%{transform:translateY(46px);opacity:0}
+}
+@keyframes stampReveal{
+  0%{opacity:0;transform:scale(.6) rotate(-8deg)}
+  65%{transform:scale(1.07) rotate(2deg)}
+  100%{opacity:1;transform:scale(1) rotate(0deg)}
+}
+.sc{animation:fadeUp .22s ease-out both}
+.scan-line{animation:scanLine 2.2s ease-in-out infinite}
+.stamp-anim{animation:stampReveal .55s cubic-bezier(.34,1.56,.64,1) both}
+
+/* ── Scroll ── */
+.scrl{overflow-y:auto;-webkit-overflow-scrolling:touch}
+.scrl::-webkit-scrollbar{display:none}
+
+/* ── Inputs ── */
+.inp{
+  width:100%;padding:13px 16px;
+  font:500 15px/1 'Inter',sans-serif;
+  background:#fff;color:#1A1714;
+  border:1.5px solid #E8E2DB;
+  border-radius:12px;outline:none;
+  transition:border-color .15s;
+}
+.inp:focus{border-color:#C4513A}
+.inp::placeholder{color:#C5B8AF}
+
+/* ── Chips ── */
+.chip{
+  display:inline-flex;align-items:center;
+  padding:7px 15px;border-radius:20px;
+  font:500 13px 'Inter',sans-serif;
+  white-space:nowrap;cursor:pointer;border:none;
+  transition:all .15s;
+}
+.on{background:#1A1714;color:#F7F4EF}
+.off{background:#EDE9E3;color:#8A7B70}
+
+/* ── Buttons ── */
+.btn-p{
+  width:100%;padding:15px;border:none;border-radius:14px;
+  cursor:pointer;font:600 16px/1 'Inter',sans-serif;
+  background:#C4513A;color:#fff;
+  transition:opacity .15s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-p:active{opacity:.85}
+.btn-s{
+  width:100%;padding:15px;background:transparent;
+  cursor:pointer;font:500 16px/1 'Inter',sans-serif;
+  color:#1A1714;border:1.5px solid #E8E2DB;border-radius:14px;
+}
+
+/* ── Cards ── */
+.card{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 16px;background:#fff;
+  border-radius:16px;cursor:pointer;
+  transition:transform .1s;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.card:active{transform:scale(.98)}
+
+/* ── Badge ── */
+.bdg{
+  display:inline-flex;align-items:center;
+  padding:3px 10px;border-radius:20px;
+  font:500 12px 'Inter',sans-serif;
+  background:#EDE9E3;color:#8A7B70;
+}
+
+/* ── Bottom nav ── */
+.bnav{
+  display:flex;border-top:1px solid #E8E2DB;
+  background:rgba(247,244,239,.96);
+  backdrop-filter:blur(10px);
+  padding:8px 0 26px;flex-shrink:0;
+}
+.ntab{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;gap:4px;padding:8px 0;
+  cursor:pointer;border:none;background:none;
+}
+.nlbl{font:500 10px/1 'Inter',sans-serif}
+
+/* ── Section label ── */
+.sec-label{
+  font:600 11px/1 'Inter',sans-serif;
+  letter-spacing:.05em;text-transform:uppercase;
+  color:#8A7B70;margin-bottom:10px;
+}

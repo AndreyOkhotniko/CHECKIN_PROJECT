@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Table, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db.base import Base
@@ -92,7 +92,9 @@ class Stamp(Base):
     user = relationship("User", back_populates="stamps")
     place = relationship("Place", back_populates="stamps")
     
+    # Уникальное ограничение: один пользователь может поставить штамп в одно
+    # место только один раз. Защищает от дублей на уровне БД (в т.ч. при гонке
+    # запросов и при пакетной офлайн-синхронизации).
     __table_args__ = (
-        # Уникальное ограничение: один пользователь может ставить штамп в одно место только один раз
-        # (если нужны повторные штампы, удалите это ограничение)
+        UniqueConstraint("user_id", "place_id", name="uq_stamp_user_place"),
     )

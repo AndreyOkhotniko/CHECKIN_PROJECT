@@ -16,6 +16,12 @@ class UserCreate(UserBase):
     password: str = Field(..., min_length=6, max_length=100)
 
 
+class LoginRequest(BaseModel):
+    """Схема для входа. Передаётся в теле запроса, чтобы пароль не попал в URL/логи."""
+    email: EmailStr
+    password: str
+
+
 class UserUpdate(BaseModel):
     """Схема для обновления профиля."""
     name: Optional[str] = None

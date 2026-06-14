@@ -1,7 +1,7 @@
-import uuid
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.user import UserResponse, UserUpdate
@@ -44,5 +44,5 @@ async def get_referral_link(
     """Получить реферальную ссылку текущего пользователя."""
     return {
         "referral_code": str(current_user.id),
-        "referral_link": f"https://yourapp.com/register?ref={current_user.id}"
+        "referral_link": f"{settings.BASE_URL}/api/auth/register/?ref={current_user.id}"
     }

@@ -4,7 +4,8 @@ uvicorn[standard]==0.24.0
 
 # Работа с БД
 sqlalchemy==2.0.23        # ORM для Python
-asyncpg==0.30.0           # Асинхронный драйвер PostgreSQL
+asyncpg==0.30.0           # Асинхронный драйвер PostgreSQL (используется приложением)
+psycopg2-binary==2.9.9    # Синхронный драйвер PostgreSQL (нужен Alembic для миграций)
 alembic==1.13.0           # Миграции БД
 
 # Валидация данных

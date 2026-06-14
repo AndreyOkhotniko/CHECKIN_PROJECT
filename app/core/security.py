@@ -69,15 +69,15 @@ def create_refresh_token(user_id: int, expires_delta: Optional[timedelta] = None
 
 
 def verify_token(token: str) -> Optional[TokenData]:
-    """Проверяет JWT token и возвращает данные."""
+    """Проверяет JWT token и возвращает данные. При любой ошибке возвращает None."""
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=["HS256"])
-        user_id: int = int(payload.get("sub"))
-        token_type: str = payload.get("type", "access")
-        
-        if user_id is None:
+        sub = payload.get("sub")
+        if sub is None:
             return None
-        
+        # sub хранится строкой; некорректное значение → TypeError/ValueError
+        user_id = int(sub)
+        token_type = payload.get("type", "access")
         return TokenData(sub=user_id, type=token_type)
-    except JWTError:
+    except (JWTError, TypeError, ValueError):
         return None

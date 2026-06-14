@@ -1,0 +1,30 @@
+# Виртуальное окружение
+venv/
+.venv/
+env/
+
+# Python байткод и кеш
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Секреты и локальная конфигурация
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Базы данных / логи
+*.sqlite3
+*.db
+*.log
+
+# Прочее
+.DS_Store
+.pytest_cache/
+.mypy_cache/

@@ -1,5 +1,4 @@
-from pydantic_settings import BaseSettings
-from pydantic import ConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import Optional
 
 class Settings(BaseSettings):
@@ -12,10 +11,12 @@ class Settings(BaseSettings):
     3. Значений по умолчанию (в порядке приоритета)
     """
     
-    model_config = ConfigDict(
+    # ВАЖНО: для pydantic-settings конфиг задаётся через SettingsConfigDict,
+    # иначе параметр env_file игнорируется и .env не загружается.
+    model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,
-        extra='ignore'  # Игнорировать дополнительные поля из .env
+        extra="ignore"  # Игнорировать дополнительные поля из .env
     )
     
     # Основные настройки проекта
@@ -24,6 +25,8 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     SECRET_KEY: str = "change-me-in-production"
+    # Базовый URL приложения (для построения реферальных ссылок и т.п.)
+    BASE_URL: str = "http://localhost:8000"
     
     # Настройки БД PostgreSQL
     POSTGRES_USER: str = "postgres"
