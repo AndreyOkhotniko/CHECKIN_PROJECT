@@ -20,7 +20,7 @@ function App() {
         {/*Регистрация*/}
         <Route path="register" element={<RegisterPage />} />
         {/*Детали места*/}
-        <Route path="/places/:id" element={<PlaceDetailPage />} />
+        <Route path="places/:id" element={<PlaceDetailPage />} />
 
         {/* Subj Routes */}
         {/*Проверка роли*/}

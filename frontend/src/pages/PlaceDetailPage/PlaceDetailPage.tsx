@@ -9,10 +9,14 @@ function PlaceDetailPage() {
   const { id } = useParams<{ id: string }>();
   const hasStamp = false;
 
-  const { isLoading, data } = usePlaceById(id ? Number(id) : undefined);
+  const { isLoading, isError, error, data } = usePlaceById(id ? Number(id) : undefined);
 
   if (isLoading) {
     return <h1>Loading</h1>;
+  }
+
+  if (isError) {
+    return <h1>Ошибка: {error.message}</h1>;
   }
 
   if (!data) {

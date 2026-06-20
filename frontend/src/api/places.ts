@@ -11,9 +11,6 @@ export const getPlaces = async () => {
 };
 
 export const getPlaceById = async (id: number | undefined) => {
-  if (id === undefined) {
-    throw new Error('Id not valid');
-  }
   const response = await Promise.resolve({
     data: PLACES_MOCK.find((place) => place.id === id),
   });

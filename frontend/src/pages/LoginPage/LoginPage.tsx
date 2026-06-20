@@ -12,7 +12,7 @@ function LoginPage() {
   const role = useLocation().state?.role || null;
 
   if (role === null) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/roles" replace />;
   }
 
   const onSubmit = (data: TypeForm) => {

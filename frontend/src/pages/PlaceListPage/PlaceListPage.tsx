@@ -10,10 +10,14 @@ function PlaceListPage() {
   const [categories, setCategories] = useState<number[]>([]);
   const [search, setSearch] = useState('');
 
-  const { data } = usePlaces();
+  const { data, isPending, isError, error } = usePlaces();
 
-  if (data === undefined) {
-    return <h1>Мест не найдено</h1>;
+  if (isPending) {
+    return <h1>Загрузка...</h1>;
+  }
+
+  if (isError) {
+    return <h1>Ошибка: {error.message}</h1>;
   }
 
   const filtredPlaces =
