@@ -9,7 +9,8 @@
 .page {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  flex: 1;
+  min-height: 0;
   background: #fff;
   font-family: 'Space Mono', monospace;
   overflow: hidden;

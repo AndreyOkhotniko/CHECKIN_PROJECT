@@ -29,10 +29,6 @@ function PlaceListPage() {
 
   return (
     <div className={s.page}>
-      <header className={s.header}>
-        <span className={s.logo}>Чекин</span>
-      </header>
-
       <div className={s.scrollArea}>
         <div className={s.content}>
           <input
@@ -84,21 +80,6 @@ function PlaceListPage() {
           )}
         </div>
       </div>
-
-      <nav className={s.bottomNav}>
-        <div className={`${s.bnItem} ${s.bnItemActive}`}>
-          <span className={s.bnIconSq} />
-          Места
-        </div>
-        <div className={s.bnItem}>
-          <span className={s.bnIconStar} />
-          Коллекция
-        </div>
-        <div className={s.bnItem}>
-          <span className={s.bnIconDot} />
-          Профиль
-        </div>
-      </nav>
     </div>
   );
 }

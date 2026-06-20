@@ -27,11 +27,9 @@ function PlaceDetailPage() {
 
   return (
     <div className={s.page}>
-      <header className={s.header}>
-        <Link to="/" className={s.backLink}>
-          ← К списку
-        </Link>
-      </header>
+      <Link to="/" className={s.backLink}>
+        ← К списку
+      </Link>
 
       <div className={s.scrollArea}>
         <div className={s.content}>
@@ -59,21 +57,6 @@ function PlaceDetailPage() {
           )}
         </div>
       </div>
-
-      <nav className={s.bottomNav}>
-        <div className={`${s.bnItem} ${s.bnItemActive}`}>
-          <span className={s.bnIconSq} />
-          Места
-        </div>
-        <div className={s.bnItem}>
-          <span className={s.bnIconStar} />
-          Коллекция
-        </div>
-        <div className={s.bnItem}>
-          <span className={s.bnIconDot} />
-          Профиль
-        </div>
-      </nav>
     </div>
   );
 }

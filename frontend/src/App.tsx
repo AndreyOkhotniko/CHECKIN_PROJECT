@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
 import PlaceListPage from './pages/PlaceListPage/PlaceListPage';
 import PlaceDetailPage from './pages/PlaceDetailPage/PlaceDetailPage';
+import ProfilePage from './pages/ProfilePage/ProfilePage';
+import CollectionPage from './pages/CollectionPage/CollectionPage';
 
 function App() {
   return (
@@ -26,9 +28,11 @@ function App() {
         {/*Проверка роли*/}
         <Route element={<ProtectedRoute role="subj" />}>
           {/*Просмотр коллекции штампов*/}
-          <Route path="collection" element={<h1>collection</h1>}></Route>
+          <Route path="collection" element={<CollectionPage />}></Route>
+          {/*Просмотр конкретного штампа*/}
+          <Route path="collection/:id" element={<h1>Collection item</h1>}></Route>
           {/*Профиль гостя*/}
-          <Route path="profile" element={<h1>profile</h1>}></Route>
+          <Route path="profile" element={<ProfilePage />}></Route>
           {/*Сканирование qr кода*/}
           <Route path="scan" element={<h1>scan</h1>}></Route>
           {/*Подтверждение чекина*/}

@@ -1,0 +1,69 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
+.bottomNav {
+  border-top: 1.5px solid #ddd;
+  background: #fafafa;
+  display: flex;
+  flex-shrink: 0;
+}
+
+.bottomNav *,
+.bottomNav *::before,
+.bottomNav *::after {
+  box-sizing: border-box;
+}
+
+.bnItem {
+  flex: 1;
+  padding: 9px 4px 11px;
+  text-align: center;
+  font-size: 9px;
+  color: #bbb;
+  cursor: pointer;
+  border-top: 2px solid transparent;
+  margin-top: -1.5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-family: 'Space Mono', monospace;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.active {
+  color: #222;
+  border-top-color: #333;
+  font-weight: 700;
+}
+
+.bnIconSq {
+  width: 18px;
+  height: 12px;
+  border: 1.5px solid currentColor;
+  border-radius: 2px;
+}
+
+.bnIconStar {
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  clip-path: polygon(
+    50% 0%,
+    61% 35%,
+    98% 35%,
+    68% 57%,
+    79% 91%,
+    50% 70%,
+    21% 91%,
+    32% 57%,
+    2% 35%,
+    39% 35%
+  );
+}
+
+.bnIconDot {
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}

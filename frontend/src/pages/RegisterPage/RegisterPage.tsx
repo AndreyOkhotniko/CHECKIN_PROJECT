@@ -13,6 +13,7 @@ function RegisterPage() {
 
   const onSubmit = (data: TypeForm) => {
     console.log(data);
+    navigate('/login');
   };
 
   return (
@@ -46,6 +47,8 @@ function RegisterPage() {
           {...register('password')}
         />
         {formState.errors.password && <p>{formState.errors.password.message}</p>}
+
+        {}
 
         <label className={s.label}>Подтвердите пароль</label>
         <input

@@ -1,8 +1,8 @@
 .container {
   max-width: 480px;
-  min-height: 100vh;
+  height: 100dvh;
   margin: 0 auto;
-  overflow-x: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
   background: #fff;

@@ -1,15 +1,18 @@
-import { Link, Navigate, useLocation } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { schema, type TypeForm } from './schema';
-
 import s from './LoginPage.module.css';
+import useAuthStore from '@/store/authStore';
+
 function LoginPage() {
+  const navigate = useNavigate();
   const { register, handleSubmit, formState } = useForm<TypeForm>({
     resolver: zodResolver(schema),
     mode: 'onBlur',
   });
   const role = useLocation().state?.role || null;
+  const { login } = useAuthStore();
 
   if (role === null) {
     return <Navigate to="/roles" replace />;
@@ -18,6 +21,9 @@ function LoginPage() {
   const onSubmit = (data: TypeForm) => {
     console.log(data);
     console.log(role);
+
+    login({ name: data.nickname, id: 1, email: 'test@test.com', phone: null, role }, role);
+    navigate('/');
   };
 
   return (
