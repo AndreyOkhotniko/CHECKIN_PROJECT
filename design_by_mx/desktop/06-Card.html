@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Чекин — Коллекция</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Чекин Desktop — Shared Styles */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter',-apple-system,sans-serif;
+  background:#F7F4EF;
+  color:#1A1714;
+  min-height:100vh;
+}
+button{font-family:inherit}
+.scrl::-webkit-scrollbar{width:8px;height:8px}
+.scrl::-webkit-scrollbar-thumb{background:#E8E2DB;border-radius:4px}
+
+/* ── Animations ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes stampReveal{
+  0%{opacity:0;transform:scale(.6) rotate(-8deg)}
+  65%{transform:scale(1.06) rotate(2deg)}
+  100%{opacity:1;transform:scale(1) rotate(0)}
+}
+.fade{animation:fadeUp .3s ease-out both}
+.stamp-anim{animation:stampReveal .6s cubic-bezier(.34,1.56,.64,1) both}
+
+/* ── Topbar ── */
+.dtopbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(247,244,239,.85);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid #E8E2DB;
+}
+.dtopbar-in{
+  max-width:1320px;margin:0 auto;
+  height:64px;padding:0 32px;
+  display:flex;align-items:center;justify-content:space-between;gap:32px;
+}
+.dnav{display:flex;align-items:center;gap:6px;flex:1}
+.dnav-link{
+  padding:8px 16px;border:none;background:none;cursor:pointer;border-radius:9px;
+  font:500 15px/1 'Inter',sans-serif;color:#8A7B70;transition:all .15s;
+}
+.dnav-link:hover{background:rgba(26,23,20,.05);color:#1A1714}
+.dnav-link.on{color:#1A1714;font-weight:600;background:rgba(196,81,58,.08)}
+
+.davatar{
+  width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;
+  background:#1A1714;color:#F7F4EF;
+  font:700 14px/1 'Inter',sans-serif;letter-spacing:.02em;
+  display:flex;align-items:center;justify-content:center;transition:transform .12s;
+}
+.davatar:hover{transform:scale(1.06)}
+
+.dbtn-sm{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 16px;border:none;border-radius:10px;cursor:pointer;
+  background:#C4513A;color:#fff;font:600 14px/1 'Inter',sans-serif;
+  transition:opacity .15s;white-space:nowrap;
+}
+.dbtn-sm:hover{opacity:.9}
+
+/* ── Layout ── */
+.dpage{min-height:100vh;display:flex;flex-direction:column}
+.dwrap{
+  width:100%;max-width:1320px;margin:0 auto;
+  padding:40px 32px 64px;flex:1;
+}
+.dwrap.wide{max-width:none}
+
+/* ── Page header ── */
+.dhead{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:28px;flex-wrap:wrap}
+.dh-title{font:700 clamp(28px,3vw,38px)/1.05 'Inter',sans-serif;color:#1A1714;letter-spacing:-.01em}
+.dh-sub{font:400 15px/1.5 'Inter',sans-serif;color:#8A7B70;margin-top:6px}
+
+/* ── Buttons ── */
+.dbtn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 24px;border:none;border-radius:12px;cursor:pointer;
+  font:600 15px/1 'Inter',sans-serif;background:#C4513A;color:#fff;transition:opacity .15s;
+}
+.dbtn:hover{opacity:.9}
+.dbtn.full{width:100%}
+.dbtn-ghost{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 24px;border:1.5px solid #E8E2DB;border-radius:12px;cursor:pointer;
+  font:500 15px/1 'Inter',sans-serif;background:transparent;color:#1A1714;transition:all .15s;
+}
+.dbtn-ghost:hover{border-color:#C5B8AF;background:rgba(0,0,0,.02)}
+.dbtn-ghost.full{width:100%}
+.dbtn-danger{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 24px;border:none;border-radius:12px;cursor:pointer;
+  font:600 15px/1 'Inter',sans-serif;background:#C0392B;color:#fff;transition:opacity .15s;
+}
+.dbtn-danger:hover{opacity:.9}
+
+/* ── Inputs ── */
+.dinput{
+  width:100%;padding:13px 16px;font:500 15px/1 'Inter',sans-serif;
+  background:#fff;color:#1A1714;border:1.5px solid #E8E2DB;border-radius:12px;
+  outline:none;transition:border-color .15s;
+}
+.dinput:focus{border-color:#C4513A}
+.dinput::placeholder{color:#C5B8AF}
+textarea.dinput{resize:none;line-height:1.6}
+
+.dsearch{position:relative;max-width:420px;width:100%}
+.dsearch svg{position:absolute;left:14px;top:50%;transform:translateY(-50%)}
+.dsearch .dinput{padding-left:42px}
+
+.dlabel{
+  font:600 12px/1 'Inter',sans-serif;letter-spacing:.05em;text-transform:uppercase;
+  color:#8A7B70;margin-bottom:10px;display:block;
+}
+
+/* ── Chips ── */
+.dchips{display:flex;flex-wrap:wrap;gap:8px}
+.dchip{
+  padding:8px 16px;border-radius:22px;border:none;cursor:pointer;
+  font:500 14px/1 'Inter',sans-serif;background:#EDE9E3;color:#8A7B70;transition:all .15s;
+}
+.dchip:hover{background:#E4DED6}
+.dchip.on{background:#1A1714;color:#F7F4EF}
+
+/* ── Badge ── */
+.dbadge{
+  display:inline-flex;align-items:center;padding:4px 12px;border-radius:22px;
+  font:500 13px 'Inter',sans-serif;background:#EDE9E3;color:#8A7B70;
+}
+
+/* ── Cards ── */
+.dgrid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;
+}
+.dgrid.tight{grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}
+.dcard{
+  background:#fff;border:1px solid #EFEAE3;border-radius:18px;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);transition:transform .15s,box-shadow .15s,border-color .15s;
+}
+.dcard.place{
+  display:flex;align-items:center;gap:18px;padding:20px;
+  text-align:left;cursor:pointer;width:100%;
+}
+.dcard.place:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,0,0,.09);border-color:#E0D6CD}
+.dcard-stamp{flex-shrink:0}
+.dcard-body{flex:1;min-width:0}
+.dcard-title{font:600 17px/1.2 'Inter',sans-serif;color:#1A1714;margin-bottom:7px}
+.dcard-addr{display:flex;align-items:center;gap:6px;font:400 13px 'Inter',sans-serif;color:#8A7B70;margin-bottom:12px}
+.dcard-foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.dcount{font:400 13px 'Inter',sans-serif;color:#C5B8AF}
+
+/* ── Panel (white surface) ── */
+.dpanel{background:#fff;border:1px solid #EFEAE3;border-radius:18px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+
+/* ── Stat ── */
+.dstat{
+  background:#fff;border:1px solid #EFEAE3;border-radius:16px;padding:22px 24px;
+  box-shadow:0 1px 3px rgba(0,0,0,.04);
+}
+.dstat-val{font:700 32px/1 'Inter',sans-serif;color:#1A1714}
+.dstat-lbl{font:400 14px 'Inter',sans-serif;color:#8A7B70;margin-top:8px}
+
+/* ── Icon button ── */
+.dicon-btn{
+  display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;
+  border-radius:10px;border:1.5px solid #E8E2DB;background:#fff;cursor:pointer;transition:all .15s;
+}
+.dicon-btn:hover{border-color:#C5B8AF;background:#FAF8F5}
+.dicon-btn.danger{border-color:#FBDBD8;background:#FEF2F1}
+.dicon-btn.danger:hover{background:#FCE8E6}
+
+/* ── Modal ── */
+.dmodal-bg{
+  position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;
+  background:rgba(20,16,14,.5);backdrop-filter:blur(4px);padding:24px;animation:fadeUp .2s ease-out;
+}
+.dmodal{
+  background:#fff;border-radius:20px;padding:32px;max-width:420px;width:100%;
+  box-shadow:0 24px 60px rgba(0,0,0,.25);
+}
+
+/* ── Page-picker (demo nav) ── */
+.dpicker{
+  position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:90;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:center;
+  max-width:calc(100vw - 32px);
+  background:rgba(20,16,14,.9);backdrop-filter:blur(12px);
+  border-radius:14px;padding:8px 10px;box-shadow:0 8px 28px rgba(0,0,0,.3);
+}
+.dpicker-grp{font:600 10px/1 'Inter',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:0 4px}
+.dpicker-pill{
+  padding:6px 11px;border-radius:8px;border:none;cursor:pointer;
+  font:600 11px/1 'Inter',sans-serif;background:rgba(255,255,255,.1);color:rgba(255,255,255,.55);
+  transition:all .15s;white-space:nowrap;
+}
+.dpicker-pill:hover{background:rgba(255,255,255,.2);color:#fff}
+.dpicker-pill.on{background:#C4513A;color:#fff}
+.dpicker-sep{width:1px;height:18px;background:rgba(255,255,255,.15);margin:0 2px}
+
+/* ── Back link ── */
+.dback{
+  display:inline-flex;align-items:center;border:none;background:none;cursor:pointer;
+  font:500 14px/1 'Inter',sans-serif;color:#8A7B70;padding:6px 0;margin-bottom:20px;transition:color .15s;
+}
+.dback:hover{color:#1A1714}
+
+/* ── Auth split ── */
+.dauth{display:grid;grid-template-columns:1.1fr 1fr;min-height:100vh}
+.dauth-brand{background:#1A1714;display:flex;align-items:center;padding:64px;position:relative;overflow:hidden}
+.dauth-brand-in{max-width:480px;position:relative;z-index:2}
+.dauth-brand .dword,.dauth-brand span{color:#F7F4EF}
+.dauth-h{font:800 clamp(34px,4vw,52px)/1.08 'Inter',sans-serif;color:#F7F4EF;letter-spacing:-.02em;margin:36px 0 18px}
+.dauth-p{font:400 17px/1.65 'Inter',sans-serif;color:rgba(247,244,239,.6);margin-bottom:48px}
+.dauth-stamps{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:280px}
+.dauth-stamp{filter:invert(1) brightness(1.6) sepia(.3);opacity:.5}
+.dauth-form{display:flex;align-items:center;justify-content:center;padding:48px}
+.dauth-form-in{width:100%;max-width:400px}
+.dauth-role{padding:16px;border-radius:14px;border:1.5px solid;cursor:pointer;text-align:left;transition:all .15s}
+
+/* ── Detail (place / card) ── */
+.ddetail{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:48px;align-items:start}
+.ddetail-aside{position:sticky;top:96px}
+
+/* ── Form (add/edit/design) ── */
+.dform{display:grid;grid-template-columns:1fr minmax(280px,360px);gap:40px;align-items:start}
+.dform-fields{display:flex;flex-direction:column;gap:24px;max-width:560px}
+.dform-preview{position:sticky;top:96px}
+
+/* ── Owned place row ── */
+.downed{display:flex;align-items:center;gap:24px;padding:24px}
+.downed-stats{display:flex;gap:28px;flex-shrink:0}
+
+/* ── Responsive ── */
+@media (max-width:900px){
+  .ddetail{grid-template-columns:1fr;gap:28px}
+  .ddetail-aside{position:static}
+  .dform{grid-template-columns:1fr}
+  .dform-preview{position:static}
+  .danalytics-grid{grid-template-columns:1fr !important}
+  .dauth{grid-template-columns:1fr}
+  .dauth-brand{display:none}
+  .downed{flex-wrap:wrap}
+  .downed-stats{order:3}
+}
+@media (max-width:560px){
+  .dwrap{padding:24px 18px 80px}
+  .dtopbar-in{padding:0 18px;gap:16px}
+  .dnav{display:none}
+  .dbtn-sm span{display:none}
+}
+
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+// Чекин Desktop — Shared Components
+const {useState} = React;
+
+// ── Tokens ──────────────────────────────────────────────────────────
+const A='#C4513A',BG='#F7F4EF',DK='#1A1714',MU='#8A7B70',ML='#C5B8AF',BD='#E8E2DB',WH='#FFFFFF';
+
+// ── Data ────────────────────────────────────────────────────────────
+const PLACES=[
+  {id:1,name:'Кофейня Юга',cat:'Кафе',color:'#C4513A',addr:'ул. Садовая, 12',desc:'Авторские напитки и домашняя выпечка. Место, где хочется возвращаться снова.',n:342,shape:'circle'},
+  {id:2,name:'Книжный',cat:'Книги',color:'#2B4570',addr:'пр. Невский, 45',desc:'Независимый книжный с редкими изданиями и тихими нишами для чтения.',n:218,shape:'octagon'},
+  {id:3,name:'Музей Форм',cat:'Культура',color:'#3A6B4A',addr:'пл. Искусств, 3',desc:'Современное искусство и дизайн в историческом здании XIX века.',n:891,shape:'square'},
+  {id:4,name:'Горизонт',cat:'Бар',color:'#7B2D42',addr:'наб. Фонтанки, 88',desc:'Крафтовые коктейли и закаты над Фонтанкой. Лучший вид в городе.',n:567,shape:'ring'},
+  {id:5,name:'Сад Камней',cat:'Парк',color:'#445566',addr:'Каменный остров, 1',desc:'Японский сад с медитативными дорожками, прудом и сезонными выставками.',n:124,shape:'hex'},
+  {id:6,name:'Галерея',cat:'Галерея',color:'#5B3D7A',addr:'ул. Марата, 24',desc:'Концептуальная галерея современных художников. Обновляется каждый месяц.',n:203,shape:'diamond'},
+];
+const COLL=[{...PLACES[2],date:'2 июня 2026'},{...PLACES[3],date:'28 мая 2026'}];
+const OWNED=[PLACES[0],PLACES[1]];
+
+// ── Stamp ────────────────────────────────────────────────────────────
+function Stamp({p,sz=120}){
+  const c=p.color,tp={fill:c,fontFamily:'Inter,sans-serif'};
+  const oPts=r=>Array.from({length:8},(_,i)=>{const a=(i*45-22.5)*Math.PI/180;return `${(60+r*Math.cos(a)).toFixed(1)},${(60+r*Math.sin(a)).toFixed(1)}`;}).join(' ');
+  const hPts=r=>Array.from({length:6},(_,i)=>{const a=(i*60+30)*Math.PI/180;return `${(60+r*Math.cos(a)).toFixed(1)},${(60+r*Math.sin(a)).toFixed(1)}`;}).join(' ');
+  const CAT=p.cat.toUpperCase();
+  let g;
+  switch(p.shape){
+    case 'circle':g=<>
+      <circle cx="60" cy="60" r="55" fill="none" stroke={c} strokeWidth="2" strokeDasharray="5 3.5"/>
+      <circle cx="60" cy="60" r="47" fill="none" stroke={c} strokeWidth="1.5"/>
+      <circle cx="60" cy="60" r="33" fill="none" stroke={c} strokeWidth="1"/>
+      <line x1="51" y1="60" x2="69" y2="60" stroke={c} strokeWidth="2.5"/>
+      <line x1="60" y1="51" x2="60" y2="69" stroke={c} strokeWidth="2.5"/>
+      <circle cx="60" cy="60" r="3.5" fill={c}/>
+      <text x="60" y="79" textAnchor="middle" fontSize="7.5" letterSpacing="2.5" {...tp}>{CAT}</text>
+      <text x="60" y="108" textAnchor="middle" fontSize="7" letterSpacing="1.5" {...tp}>2 0 2 6</text>
+    </>;break;
+    case 'octagon':g=<>
+      <polygon points={oPts(55)} fill="none" stroke={c} strokeWidth="2"/>
+      <polygon points={oPts(44)} fill="none" stroke={c} strokeWidth="1"/>
+      {[45,52,60,68,75].map(y=><line key={y} x1="38" y1={y} x2="82" y2={y} stroke={c} strokeWidth="0.9"/>)}
+      <text x="60" y="91" textAnchor="middle" fontSize="7.5" letterSpacing="2" {...tp}>{CAT}</text>
+    </>;break;
+    case 'square':g=<>
+      <rect x="7" y="7" width="106" height="106" fill="none" stroke={c} strokeWidth="2"/>
+      <rect x="19" y="19" width="82" height="82" fill="none" stroke={c} strokeWidth="1"/>
+      <line x1="7" y1="21" x2="21" y2="7" stroke={c} strokeWidth="1.5"/>
+      <line x1="99" y1="7" x2="113" y2="21" stroke={c} strokeWidth="1.5"/>
+      <line x1="7" y1="99" x2="21" y2="113" stroke={c} strokeWidth="1.5"/>
+      <line x1="99" y1="113" x2="113" y2="99" stroke={c} strokeWidth="1.5"/>
+      <line x1="19" y1="46" x2="101" y2="46" stroke={c} strokeWidth="0.75"/>
+      <line x1="19" y1="74" x2="101" y2="74" stroke={c} strokeWidth="0.75"/>
+      <line x1="46" y1="19" x2="46" y2="101" stroke={c} strokeWidth="0.75"/>
+      <line x1="74" y1="19" x2="74" y2="101" stroke={c} strokeWidth="0.75"/>
+      <circle cx="60" cy="60" r="5" fill={c}/>
+    </>;break;
+    case 'ring':g=<>
+      <circle cx="60" cy="60" r="55" fill="none" stroke={c} strokeWidth="2"/>
+      <circle cx="60" cy="60" r="44" fill="none" stroke={c} strokeWidth="1"/>
+      <circle cx="60" cy="60" r="31" fill="none" stroke={c} strokeWidth="1.5" strokeDasharray="4 3"/>
+      {[0,45,90,135].map(deg=>{const r=deg*Math.PI/180;return <line key={deg} x1={60+14*Math.cos(r)} y1={60+14*Math.sin(r)} x2={60-14*Math.cos(r)} y2={60-14*Math.sin(r)} stroke={c} strokeWidth="1.5"/>;})}
+      <text x="60" y="108" textAnchor="middle" fontSize="7.5" letterSpacing="2" {...tp}>{CAT}</text>
+    </>;break;
+    case 'hex':g=<>
+      <polygon points={hPts(55)} fill="none" stroke={c} strokeWidth="2"/>
+      <polygon points={hPts(43)} fill="none" stroke={c} strokeWidth="1"/>
+      <circle cx="60" cy="57" r="21" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round" strokeDasharray="105 20"/>
+      <text x="60" y="90" textAnchor="middle" fontSize="7.5" letterSpacing="2" {...tp}>{CAT}</text>
+    </>;break;
+    case 'diamond':g=<>
+      <polygon points="60,5 115,60 60,115 5,60" fill="none" stroke={c} strokeWidth="2"/>
+      <polygon points="60,20 100,60 60,100 20,60" fill="none" stroke={c} strokeWidth="1"/>
+      {[[48,48],[60,48],[72,48],[48,60],[60,60],[72,60],[48,72],[60,72],[72,72]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="2" fill={c}/>)}
+      <text x="60" y="112" textAnchor="middle" fontSize="7.5" letterSpacing="2" {...tp}>{CAT}</text>
+    </>;break;
+    default:g=null;
+  }
+  return <svg viewBox="0 0 120 120" width={sz} height={sz} style={{display:'block',overflow:'visible'}}>{g}</svg>;
+}
+
+// ── QR Mock ──────────────────────────────────────────────────────────
+function QRMock({size=180,color='#1A1714'}){
+  const M=[
+    [1,1,1,1,1,1,1,0,1,0,1,0,1,1,1,1,1,1,1],[1,0,0,0,0,0,1,0,0,1,0,1,1,0,0,0,0,0,1],
+    [1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,1,1,0,1],[1,0,1,1,1,0,1,0,0,1,0,1,1,0,1,1,1,0,1],
+    [1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,1,1,0,1],[1,0,0,0,0,0,1,0,0,1,0,0,1,0,0,0,0,0,1],
+    [1,1,1,1,1,1,1,0,1,0,1,0,1,1,1,1,1,1,1],[0,0,0,0,0,0,0,0,0,1,0,1,0,0,0,0,0,0,0],
+    [1,0,1,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0,1],[0,1,0,0,1,0,1,0,1,0,1,0,1,0,0,1,0,1,0],
+    [1,0,1,0,0,1,0,1,0,1,0,1,0,1,1,0,0,1,1],[0,1,0,1,0,0,0,1,0,0,1,0,1,0,0,1,0,0,0],
+    [1,0,0,0,1,0,1,0,1,0,0,0,0,0,1,0,0,0,1],[0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,1,0],
+    [1,1,1,1,1,1,1,0,0,1,0,1,0,1,0,1,1,0,1],[1,0,0,0,0,0,1,0,1,0,1,0,0,0,1,0,0,1,0],
+    [1,0,1,1,1,0,1,0,0,1,0,1,0,1,0,0,1,0,1],[1,0,1,1,1,0,1,0,1,0,1,0,1,0,1,1,0,1,0],
+    [1,0,1,1,1,0,1,0,0,1,0,0,0,1,1,0,0,1,1],[1,0,0,0,0,0,1,0,1,0,1,0,0,0,0,1,0,0,0],
+    [1,1,1,1,1,1,1,0,0,0,0,0,1,0,1,0,1,0,1],
+  ];
+  const n=M.length,cs=size/n;
+  return <svg width={size} height={size} viewBox={'0 0 '+size+' '+size} style={{display:'block'}}>
+    {M.map((row,r)=>row.map((v,c)=>v?<rect key={r+'-'+c} x={c*cs} y={r*cs} width={cs-.5} height={cs-.5} fill={color} rx="0.8"/>:null))}
+  </svg>;
+}
+
+// ── Icons ────────────────────────────────────────────────────────────
+const IcSearch=({s=18,c=ML})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>;
+const IcShare=({s=18,c=WH})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>;
+const IcCopy=({s=15,c=A})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>;
+const IcPin=({s=18,c=MU})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.75" strokeLinecap="round"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg>;
+const IcEdit=({s=16,c=MU})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>;
+const IcTrash=({s=16,c=MU})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>;
+const IcPlus=({s=16,c=WH})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2.5" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>;
+const IcChevR=({s=16,c=ML})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round"><path d="M9 18l6-6-6-6"/></svg>;
+const IcDownload=({s=18,c=WH})=><svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>;
+
+// ── Wordmark ─────────────────────────────────────────────────────────
+function Wordmark({sub}){
+  return <div style={{display:'flex',alignItems:'center',gap:10}}>
+    <Stamp p={PLACES[0]} sz={30}/>
+    <div style={{display:'flex',alignItems:'baseline',gap:8}}>
+      <span style={{fontSize:18,fontWeight:800,letterSpacing:'.14em',color:DK}}>ЧЕКИН</span>
+      {sub&&<span style={{fontSize:12,fontWeight:500,color:MU,letterSpacing:'.02em'}}>{sub}</span>}
+    </div>
+  </div>;
+}
+
+// ── Topbar ───────────────────────────────────────────────────────────
+function Topbar({role,active,go}){
+  const guestNav=[['places','Места'],['collection','Коллекция']];
+  const ownerNav=[['dashboard','Мои места'],['analytics','Аналитика']];
+  const nav=role==='owner'?ownerNav:guestNav;
+  return <header className="dtopbar">
+    <div className="dtopbar-in">
+      <div style={{cursor:'pointer'}} onClick={()=>go(role==='owner'?'dashboard':'places')}>
+        <Wordmark sub={role==='owner'?'для бизнеса':null}/>
+      </div>
+      <nav className="dnav">
+        {nav.map(([id,lbl])=>(
+          <button key={id} className={'dnav-link'+(active===id?' on':'')} onClick={()=>go(id)}>{lbl}</button>
+        ))}
+      </nav>
+      <div style={{display:'flex',alignItems:'center',gap:14}}>
+        {role==='owner'&&(
+          <button className="dbtn-sm" onClick={()=>go('add')}><IcPlus s={14}/>Добавить место</button>
+        )}
+        <button className="davatar" onClick={()=>go(role==='owner'?'profile':'profile')}>
+          <span>АЛ</span>
+        </button>
+      </div>
+    </div>
+  </header>;
+}
+
+// ── Page shell ───────────────────────────────────────────────────────
+function Page({role,active,go,children,wide}){
+  return <div className="dpage">
+    <Topbar role={role} active={active} go={go}/>
+    <main className={'dwrap'+(wide?' wide':'')}>{children}</main>
+  </div>;
+}
+
+// ── Filter chips ─────────────────────────────────────────────────────
+function Chips({items,value,onChange}){
+  return <div className="dchips">
+    {items.map(c=><button key={c} className={'dchip'+(value===c?' on':'')} onClick={()=>onChange(c)}>{c}</button>)}
+  </div>;
+}
+
+// ── Place card ───────────────────────────────────────────────────────
+function PlaceCard({p,onClick,count=true}){
+  return <button className="dcard place" onClick={onClick}>
+    <div className="dcard-stamp"><Stamp p={p} sz={88}/></div>
+    <div className="dcard-body">
+      <div className="dcard-title">{p.name}</div>
+      <div className="dcard-addr"><IcPin s={13} c={MU}/>{p.addr}</div>
+      <div className="dcard-foot">
+        <span className="dbadge">{p.cat}</span>
+        {count&&<span className="dcount">{p.n} штампов</span>}
+      </div>
+    </div>
+  </button>;
+}
+
+Object.assign(window,{
+  A,BG,DK,MU,ML,BD,WH,PLACES,COLL,OWNED,
+  Stamp,QRMock,Wordmark,Topbar,Page,Chips,PlaceCard,
+  IcSearch,IcShare,IcCopy,IcPin,IcEdit,IcTrash,IcPlus,IcChevR,IcDownload,
+});
+
+
+
+
+// Чекин Desktop — Pages
+const {useState:uS} = React;
+
+// ════ AUTH ════════════════════════════════════════════════════════════
+function DAuth({go}){
+  const [tab,setTab]=uS('in');
+  const [role,setRole]=uS('guest');
+  return <div className="dauth fade">
+    {/* Brand panel */}
+    <div className="dauth-brand">
+      <div className="dauth-brand-in">
+        <Wordmark/>
+        <h1 className="dauth-h">Цифровая книга<br/>штампов</h1>
+        <p className="dauth-p">Собирайте отметки мест, которые вам важны. Каждое место — свой уникальный штамп.</p>
+        <div className="dauth-stamps">
+          {PLACES.map(p=><div key={p.id} className="dauth-stamp"><Stamp p={p} sz={66}/></div>)}
+        </div>
+      </div>
+    </div>
+    {/* Form panel */}
+    <div className="dauth-form">
+      <div className="dauth-form-in">
+        <div style={{fontSize:26,fontWeight:700,color:DK,marginBottom:6}}>{tab==='in'?'Вход в Чекин':'Создать аккаунт'}</div>
+        <div style={{fontSize:15,color:MU,marginBottom:28}}>{tab==='in'?'Рады видеть вас снова':'Несколько штампов уже ждут вас'}</div>
+        {/* role */}
+        <div className="dlabel">Я хочу войти как</div>
+        <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:22}}>
+          {[['guest','Гость','Собираю штампы'],['owner','Владелец','Управляю местами']].map(([r,t,s])=>(
+            <button key={r} onClick={()=>setRole(r)} className="dauth-role" style={{
+              borderColor:role===r?A:BD,background:role===r?'rgba(196,81,58,.05)':WH,
+            }}>
+              <div style={{fontSize:15,fontWeight:600,color:DK}}>{t}</div>
+              <div style={{fontSize:12,color:MU,marginTop:3}}>{s}</div>
+            </button>
+          ))}
+        </div>
+        <div style={{display:'flex',flexDirection:'column',gap:12,marginBottom:22}}>
+          {tab==='up'&&<input className="dinput" placeholder="Ник (@username)"/>}
+          <input className="dinput" type="email" placeholder="Email"/>
+          <input className="dinput" type="password" placeholder="Пароль"/>
+        </div>
+        <button className="dbtn full" onClick={()=>go(role==='owner'?'dashboard':'places',{role})}>
+          {tab==='in'?'Войти':'Зарегистрироваться'}
+        </button>
+        <div style={{textAlign:'center',marginTop:18,fontSize:14,color:MU}}>
+          {tab==='in'?'Нет аккаунта? ':'Уже есть аккаунт? '}
+          <span style={{color:A,fontWeight:600,cursor:'pointer'}} onClick={()=>setTab(tab==='in'?'up':'in')}>{tab==='in'?'Регистрация':'Войти'}</span>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+// ════ PLACES (guest grid) ═════════════════════════════════════════════
+function DPlaces({go}){
+  const [chip,setChip]=uS('Все');
+  const [q,setQ]=uS('');
+  const cats=['Все','Кафе','Книги','Культура','Бар','Парк','Галерея'];
+  let list=chip==='Все'?PLACES:PLACES.filter(p=>p.cat===chip);
+  if(q)list=list.filter(p=>p.name.toLowerCase().includes(q.toLowerCase()));
+  return <Page role="guest" active="places" go={go}>
+    <div className="fade">
+      <div className="dhead">
+        <div>
+          <div className="dh-title">Места</div>
+          <div className="dh-sub">{PLACES.length} мест собирают штампы рядом с вами</div>
+        </div>
+        <div className="dsearch"><IcSearch/><input className="dinput" placeholder="Поиск мест" value={q} onChange={e=>setQ(e.target.value)}/></div>
+      </div>
+      <div style={{marginBottom:24}}><Chips items={cats} value={chip} onChange={setChip}/></div>
+      <div className="dgrid">
+        {list.map(p=><PlaceCard key={p.id} p={p} onClick={()=>go('place',{place:p})}/>)}
+      </div>
+      {list.length===0&&<div style={{padding:'60px 0',textAlign:'center',color:MU,fontSize:15}}>Ничего не найдено</div>}
+    </div>
+  </Page>;
+}
+
+// ════ PLACE DETAIL ════════════════════════════════════════════════════
+function DPlace({go,place}){
+  const p=place||PLACES[0];
+  return <Page role="guest" active="places" go={go}>
+    <div className="fade">
+      <button className="dback" onClick={()=>go('places')}>← Все места</button>
+      <div className="ddetail">
+        <div className="ddetail-aside">
+          <div className="dpanel" style={{padding:'40px 32px',display:'flex',flexDirection:'column',alignItems:'center',gap:24}}>
+            <Stamp p={p} sz={210}/>
+            <div style={{display:'flex',alignItems:'center',gap:8,padding:'10px 18px',background:BG,borderRadius:30}}>
+              <div style={{width:8,height:8,borderRadius:'50%',background:p.color}}/>
+              <span style={{fontSize:14,color:MU}}>{p.n} штампов поставлено</span>
+            </div>
+          </div>
+        </div>
+        <div className="ddetail-main">
+          <span className="dbadge" style={{marginBottom:16}}>{p.cat}</span>
+          <h1 style={{fontSize:38,fontWeight:700,color:DK,letterSpacing:'-.01em',marginBottom:12}}>{p.name}</h1>
+          <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:28}}>
+            <IcPin s={18} c={MU}/><span style={{fontSize:16,color:MU}}>{p.addr}</span>
+          </div>
+          <p style={{fontSize:18,lineHeight:1.7,color:DK,marginBottom:36,maxWidth:560}}>{p.desc}</p>
+          <div className="dpanel" style={{padding:24,maxWidth:560,marginBottom:28}}>
+            <div style={{display:'flex',gap:16,alignItems:'flex-start'}}>
+              <div style={{flexShrink:0,marginTop:2}}><QRMock size={64} color={p.color}/></div>
+              <div>
+                <div style={{fontSize:15,fontWeight:600,color:DK,marginBottom:4}}>Как получить штамп</div>
+                <div style={{fontSize:14,color:MU,lineHeight:1.6}}>Отсканируйте QR-код в заведении через мобильное приложение Чекин, чтобы добавить штамп в коллекцию.</div>
+              </div>
+            </div>
+          </div>
+          <button className="dbtn" onClick={()=>go('confirm',{place:p})}>Получить штамп</button>
+        </div>
+      </div>
+    </div>
+  </Page>;
+}
+
+// ════ STAMP CONFIRM ═══════════════════════════════════════════════════
+function DConfirm({go,place}){
+  const p=place||PLACES[0];
+  const d=new Date().toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric'});
+  return <Page role="guest" active="places" go={go}>
+    <div className="fade" style={{display:'flex',flexDirection:'column',alignItems:'center',textAlign:'center',padding:'40px 0 20px'}}>
+      <div style={{fontSize:14,fontWeight:600,letterSpacing:'.08em',textTransform:'uppercase',color:A,marginBottom:28}}>Новый штамп получен</div>
+      <div className="stamp-anim" style={{marginBottom:32}}><Stamp p={p} sz={240}/></div>
+      <h1 style={{fontSize:34,fontWeight:700,color:DK,marginBottom:8}}>{p.name}</h1>
+      <div style={{display:'flex',alignItems:'center',gap:10,marginBottom:40}}>
+        <span className="dbadge">{p.cat}</span>
+        <span style={{color:ML}}>·</span>
+        <span style={{fontSize:15,color:MU}}>{d}</span>
+      </div>
+      <div style={{display:'flex',gap:12}}>
+        <button className="dbtn" onClick={()=>go('collection')}>В коллекцию</button>
+        <button className="dbtn-ghost" onClick={()=>go('places')}>К местам</button>
+      </div>
+    </div>
+  </Page>;
+}
+
+// ════ COLLECTION ══════════════════════════════════════════════════════
+function DCollection({go}){
+  return <Page role="guest" active="collection" go={go}>
+    <div className="fade">
+      <div className="dhead">
+        <div>
+          <div className="dh-title">Коллекция</div>
+          <div className="dh-sub">{COLL.length} штампа собрано · ещё {PLACES.length-COLL.length} мест ждут вас</div>
+        </div>
+        <button className="dbtn-ghost" onClick={()=>go('places')}>Найти места</button>
+      </div>
+      <div className="dgrid">
+        {COLL.map((item,i)=>(
+          <button key={i} className="dcard" style={{padding:28,display:'flex',flexDirection:'column',alignItems:'center',gap:18,cursor:'pointer'}} onClick={()=>go('card',{stamp:item})}>
+            <Stamp p={item} sz={130}/>
+            <div style={{textAlign:'center'}}>
+              <div style={{fontSize:17,fontWeight:600,color:DK,marginBottom:6}}>{item.name}</div>
+              <div style={{fontSize:13,color:MU}}>{item.date}</div>
+            </div>
+          </button>
+        ))}
+        {/* Locked teaser */}
+        {PLACES.filter(p=>!COLL.find(c=>c.id===p.id)).slice(0,2).map(p=>(
+          <button key={'l'+p.id} className="dcard" style={{padding:28,display:'flex',flexDirection:'column',alignItems:'center',gap:18,cursor:'pointer',borderStyle:'dashed',background:'transparent',boxShadow:'none'}} onClick={()=>go('place',{place:p})}>
+            <div style={{opacity:.2}}><Stamp p={p} sz={130}/></div>
+            <div style={{textAlign:'center'}}>
+              <div style={{fontSize:15,fontWeight:500,color:MU,marginBottom:6}}>{p.name}</div>
+              <div style={{fontSize:13,color:ML}}>Ещё не получен</div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  </Page>;
+}
+
+// ════ STAMP CARD ══════════════════════════════════════════════════════
+function DCard({go,stamp}){
+  const p=stamp||COLL[0];
+  const [done,setDone]=uS(false);
+  return <Page role="guest" active="collection" go={go}>
+    <div className="fade">
+      <button className="dback" onClick={()=>go('collection')}>← Коллекция</button>
+      <div className="ddetail">
+        <div className="ddetail-aside">
+          <div className="dpanel" style={{padding:'48px 32px',display:'flex',justifyContent:'center'}}>
+            <Stamp p={p} sz={230}/>
+          </div>
+        </div>
+        <div className="ddetail-main" style={{display:'flex',flexDirection:'column',justifyContent:'center'}}>
+          <span className="dbadge" style={{marginBottom:16,alignSelf:'flex-start'}}>{p.cat}</span>
+          <h1 style={{fontSize:38,fontWeight:700,color:DK,marginBottom:16}}>{p.name}</h1>
+          <div style={{display:'flex',flexDirection:'column',gap:12,marginBottom:36}}>
+            <div style={{display:'flex',alignItems:'center',gap:10,fontSize:16,color:MU}}><IcPin s={17} c={MU}/>{p.addr}</div>
+            <div style={{display:'flex',alignItems:'center',gap:10,fontSize:16,color:MU}}>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={MU} strokeWidth="1.75" strokeLinecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Получен {p.date}
+            </div>
+          </div>
+          <div style={{display:'flex',gap:12}}>
+            <button className="dbtn" onClick={()=>{setDone(true);setTimeout(()=>setDone(false),2200);}}><IcShare/>{done?'✓ Ссылка скопирована':'Поделиться'}</button>
+            <button className="dbtn-ghost" onClick={()=>go('place',{place:p})}>О месте</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Page>;
+}
+
+// ════ PROFILE ═════════════════════════════════════════════════════════
+function DProfile({go,role}){
+  const [copied,setCopied]=uS(false);
+  return <Page role={role||'guest'} active="profile" go={go}>
+    <div className="fade" style={{maxWidth:720,margin:'0 auto'}}>
+      <div className="dpanel" style={{padding:'40px',display:'flex',alignItems:'center',gap:28,marginBottom:24}}>
+        <div style={{width:88,height:88,borderRadius:'50%',background:DK,display:'flex',alignItems:'center',justifyContent:'center',fontSize:30,fontWeight:700,color:BG,flexShrink:0}}>АЛ</div>
+        <div style={{flex:1}}>
+          <div style={{fontSize:26,fontWeight:700,color:DK,marginBottom:6}}>@aleksei</div>
+          <div style={{display:'inline-flex',alignItems:'center',gap:8,padding:'7px 16px',background:BG,borderRadius:30}}>
+            <div style={{width:8,height:8,borderRadius:'50%',background:A}}/>
+            <span style={{fontSize:14,fontWeight:600,color:DK}}>{COLL.length} штампа</span>
+          </div>
+        </div>
+        <button className="dbtn-ghost" onClick={()=>go('auth')}>Выйти</button>
+      </div>
+      <div className="dpanel" style={{padding:'28px 32px',marginBottom:24}}>
+        <div className="dlabel">Реферальная ссылка</div>
+        <div style={{display:'flex',alignItems:'center',gap:12}}>
+          <span style={{flex:1,fontSize:15,color:MU,fontFamily:'monospace',padding:'12px 16px',background:BG,borderRadius:10,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>checkin.app/ref/aleksei24</span>
+          <button className="dbtn-ghost" style={{padding:'12px 18px',color:A,borderColor:A}} onClick={()=>{setCopied(true);setTimeout(()=>setCopied(false),2000)}}><IcCopy/>{copied?'Скопировано':'Скопировать'}</button>
+        </div>
+        <div style={{fontSize:13,color:ML,marginTop:12}}>Приглашайте друзей — за каждого получите особый штамп.</div>
+      </div>
+      {role!=='owner'&&(
+        <div className="dpanel" style={{padding:'28px 32px',display:'flex',alignItems:'center',justifyContent:'space-between',gap:20}}>
+          <div>
+            <div style={{fontSize:16,fontWeight:600,color:DK,marginBottom:4}}>У вас есть заведение?</div>
+            <div style={{fontSize:14,color:MU}}>Создайте штамп и привлекайте гостей.</div>
+          </div>
+          <button className="dbtn-sm" onClick={()=>go('dashboard',{role:'owner'})}>Кабинет владельца</button>
+        </div>
+      )}
+    </div>
+  </Page>;
+}
+
+// ════ OWNER: DASHBOARD ════════════════════════════════════════════════
+function DDashboard({go}){
+  const [del,setDel]=uS(null);
+  const total=OWNED.reduce((s,p)=>s+p.n,0);
+  return <Page role="owner" active="dashboard" go={go}>
+    {del&&(
+      <div className="dmodal-bg" onClick={()=>setDel(null)}>
+        <div className="dmodal" onClick={e=>e.stopPropagation()}>
+          <div style={{fontSize:20,fontWeight:700,color:DK,marginBottom:8}}>Удалить место?</div>
+          <div style={{fontSize:15,color:MU,lineHeight:1.6,marginBottom:28}}>«{del.name}» будет удалено вместе со всеми данными и штампами гостей. Это действие нельзя отменить.</div>
+          <div style={{display:'flex',gap:12,justifyContent:'flex-end'}}>
+            <button className="dbtn-ghost" onClick={()=>setDel(null)}>Отмена</button>
+            <button className="dbtn-danger" onClick={()=>setDel(null)}>Удалить</button>
+          </div>
+        </div>
+      </div>
+    )}
+    <div className="fade">
+      <div className="dhead">
+        <div>
+          <div className="dh-title">Мои места</div>
+          <div className="dh-sub">{OWNED.length} места · {total} штампов всего</div>
+        </div>
+        <button className="dbtn" onClick={()=>go('add')}><IcPlus/>Добавить место</button>
+      </div>
+      <div style={{display:'flex',flexDirection:'column',gap:16}}>
+        {OWNED.map(p=>(
+          <div key={p.id} className="dpanel downed">
+            <div style={{flexShrink:0,cursor:'pointer'}} onClick={()=>go('analytics',{ownerPlace:p})}><Stamp p={p} sz={76}/></div>
+            <div style={{flex:1,minWidth:0,cursor:'pointer'}} onClick={()=>go('analytics',{ownerPlace:p})}>
+              <div style={{fontSize:19,fontWeight:600,color:DK,marginBottom:6}}>{p.name}</div>
+              <div style={{display:'flex',alignItems:'center',gap:8,marginBottom:10,fontSize:14,color:MU}}><IcPin s={14} c={MU}/>{p.addr}</div>
+              <span className="dbadge">{p.cat}</span>
+            </div>
+            <div className="downed-stats">
+              <div><div className="dstat-val" style={{fontSize:26}}>{p.n}</div><div style={{fontSize:13,color:MU}}>всего</div></div>
+              <div><div className="dstat-val" style={{fontSize:26,color:A}}>+12</div><div style={{fontSize:13,color:MU}}>сегодня</div></div>
+            </div>
+            <div style={{flexShrink:0}}><QRMock size={64} color={p.color}/></div>
+            <div style={{display:'flex',flexDirection:'column',gap:8,flexShrink:0}}>
+              <button className="dicon-btn" title="QR-код" onClick={()=>go('qr',{ownerPlace:p})}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={MU} strokeWidth="1.75"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><line x1="14" y1="14" x2="14" y2="21"/><line x1="18" y1="14" x2="21" y2="14"/><line x1="18" y1="18" x2="21" y2="21"/></svg>
+              </button>
+              <button className="dicon-btn" title="Редактировать" onClick={()=>go('edit',{ownerPlace:p})}><IcEdit/></button>
+              <button className="dicon-btn danger" title="Удалить" onClick={()=>setDel(p)}><IcTrash c="#C0392B"/></button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Page>;
+}
+
+// ════ OWNER: ADD / EDIT (form) ════════════════════════════════════════
+function PlaceForm({go,initial,isEdit}){
+  const base=initial||{name:'',cat:'Кафе',addr:'',desc:'',color:'#C4513A',shape:'circle'};
+  const [form,setForm]=uS({name:base.name,cat:base.cat,addr:base.addr,desc:base.desc||''});
+  const cats=['Кафе','Книги','Культура','Бар','Парк','Галерея'];
+  const preview={...base,...form};
+  return <Page role="owner" active="dashboard" go={go}>
+    <div className="fade">
+      <button className="dback" onClick={()=>go('dashboard')}>← Мои места</button>
+      <div className="dhead"><div><div className="dh-title">{isEdit?'Редактировать место':'Новое место'}</div><div className="dh-sub">{isEdit?base.name:'Шаг 1 из 2 — данные о месте'}</div></div></div>
+      <div className="dform">
+        <div className="dform-fields">
+          <div><label className="dlabel">Название</label><input className="dinput" placeholder="Название вашего места" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/></div>
+          <div><label className="dlabel">Категория</label><Chips items={cats} value={form.cat} onChange={c=>setForm({...form,cat:c})}/></div>
+          <div><label className="dlabel">Адрес</label><input className="dinput" placeholder="ул. Примерная, 1" value={form.addr} onChange={e=>setForm({...form,addr:e.target.value})}/></div>
+          <div><label className="dlabel">Описание</label><textarea className="dinput" rows={4} placeholder="Расскажите гостям о месте..." value={form.desc} onChange={e=>setForm({...form,desc:e.target.value})}/></div>
+          <div style={{display:'flex',gap:12,marginTop:8}}>
+            {isEdit
+              ? <><button className="dbtn" onClick={()=>go('dashboard')}>Сохранить изменения</button><button className="dbtn-ghost" onClick={()=>go('design',{newPlace:preview})}>Изменить штамп</button></>
+              : <button className="dbtn" onClick={()=>go('design',{newPlace:preview})}>Далее — дизайн штампа →</button>}
+          </div>
+        </div>
+        <aside className="dform-preview">
+          <div className="dlabel">Превью карточки</div>
+          <div className="dpanel" style={{padding:20,display:'flex',alignItems:'center',gap:16}}>
+            <Stamp p={preview} sz={72}/>
+            <div style={{minWidth:0}}>
+              <div style={{fontSize:16,fontWeight:600,color:DK,marginBottom:5}}>{form.name||'Название места'}</div>
+              <div style={{fontSize:13,color:MU,marginBottom:8}}>{form.addr||'Адрес'}</div>
+              <span className="dbadge">{form.cat}</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </Page>;
+}
+function DAdd({go,newPlace}){return <PlaceForm go={go} initial={newPlace} isEdit={false}/>;}
+function DEdit({go,ownerPlace}){return <PlaceForm go={go} initial={ownerPlace||OWNED[0]} isEdit={true}/>;}
+
+// ════ OWNER: STAMP DESIGNER ═══════════════════════════════════════════
+function DDesign({go,newPlace}){
+  const shapes=['circle','octagon','square','ring','hex','diamond'];
+  const colors=['#C4513A','#2B4570','#3A6B4A','#7B2D42','#445566','#5B3D7A'];
+  const [shape,setShape]=uS((newPlace&&newPlace.shape)||'circle');
+  const [color,setColor]=uS((newPlace&&newPlace.color)||'#C4513A');
+  const prev={id:'p',name:(newPlace&&newPlace.name)||'Ваш штамп',cat:(newPlace&&newPlace.cat)||'Место',color,shape};
+  return <Page role="owner" active="dashboard" go={go}>
+    <div className="fade">
+      <button className="dback" onClick={()=>go('add',{newPlace:{...newPlace,color,shape}})}>← Данные места</button>
+      <div className="dhead"><div><div className="dh-title">Дизайн штампа</div><div className="dh-sub">Шаг 2 из 2 — выберите форму и цвет</div></div></div>
+      <div className="dform">
+        <div className="dform-fields">
+          <div>
+            <label className="dlabel">Форма</label>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:12}}>
+              {shapes.map(s=>(
+                <button key={s} onClick={()=>setShape(s)} style={{display:'flex',justifyContent:'center',alignItems:'center',padding:'18px 0',borderRadius:14,cursor:'pointer',background:shape===s?color+'14':WH,border:shape===s?'2px solid '+color:'2px solid '+BD,transition:'all .15s'}}>
+                  <Stamp p={{...prev,shape:s}} sz={56}/>
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="dlabel">Цвет</label>
+            <div style={{display:'flex',gap:14}}>
+              {colors.map(col=>(
+                <button key={col} onClick={()=>setColor(col)} style={{width:44,height:44,borderRadius:'50%',background:col,cursor:'pointer',border:'none',boxShadow:color===col?'0 0 0 3px '+WH+', 0 0 0 5.5px '+col:'none',transition:'box-shadow .15s'}}/>
+              ))}
+            </div>
+          </div>
+          <div style={{display:'flex',gap:12,marginTop:8}}>
+            <button className="dbtn" onClick={()=>go('qr',{newPlace:{...prev,...(newPlace||{}),color,shape}})}>Создать место и QR-код</button>
+          </div>
+        </div>
+        <aside className="dform-preview">
+          <div className="dlabel">Превью штампа</div>
+          <div className="dpanel" style={{padding:'40px 24px',display:'flex',flexDirection:'column',alignItems:'center',gap:16}}>
+            <Stamp p={prev} sz={150}/>
+            <div style={{fontSize:15,fontWeight:600,color:DK}}>{prev.name}</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </Page>;
+}
+
+// ════ OWNER: QR CODE ══════════════════════════════════════════════════
+function DQR({go,newPlace,ownerPlace}){
+  const p=ownerPlace||newPlace||OWNED[0];
+  const isNew=!!newPlace&&!ownerPlace;
+  return <Page role="owner" active="dashboard" go={go}>
+    <div className="fade" style={{maxWidth:560,margin:'0 auto',textAlign:'center'}}>
+      {isNew&&(
+        <div style={{marginBottom:28}}>
+          <div style={{width:56,height:56,borderRadius:'50%',background:'#3A6B4A',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 16px'}}>
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke={WH} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div style={{fontSize:26,fontWeight:700,color:DK,marginBottom:6}}>Место создано!</div>
+          <div style={{fontSize:15,color:MU}}>Распечатайте QR-код и разместите его в заведении</div>
+        </div>
+      )}
+      {!isNew&&<button className="dback" style={{margin:'0 auto 20px'}} onClick={()=>go('dashboard')}>← Мои места</button>}
+      <div className="dpanel" style={{padding:40,display:'inline-block',marginBottom:28}}>
+        <QRMock size={220} color={p.color||DK}/>
+        <div style={{marginTop:18,fontSize:18,fontWeight:700,color:DK}}>{p.name}</div>
+        <div style={{fontSize:13,color:MU,marginTop:4,fontFamily:'monospace'}}>checkin.app/place/{p.id||'new'}</div>
+      </div>
+      <div style={{display:'flex',gap:12,justifyContent:'center'}}>
+        <button className="dbtn"><IcDownload/>Скачать PDF</button>
+        <button className="dbtn-ghost" onClick={()=>go('dashboard')}>{isNew?'К моим местам':'Готово'}</button>
+      </div>
+    </div>
+  </Page>;
+}
+
+// ════ OWNER: ANALYTICS ════════════════════════════════════════════════
+function DAnalytics({go,ownerPlace}){
+  const init=ownerPlace?Math.max(0,OWNED.findIndex(p=>p.id===ownerPlace.id)):0;
+  const [sel,setSel]=uS(init);
+  const p=OWNED[sel]||OWNED[0];
+  const BARS=[{d:'Пн',v:8},{d:'Вт',v:15},{d:'Ср',v:12},{d:'Чт',v:24},{d:'Пт',v:31},{d:'Сб',v:47},{d:'Вс',v:28}];
+  const mx=Math.max(...BARS.map(b=>b.v));
+  const RECENT=[{u:'@marina_s',t:'сейчас'},{u:'@pavel_k',t:'2 мин назад'},{u:'@lena_art',t:'7 мин назад'},{u:'@igor_m',t:'15 мин назад'},{u:'@sonya_t',t:'23 мин назад'},{u:'@dmitry_v',t:'34 мин назад'}];
+  return <Page role="owner" active="analytics" go={go}>
+    <div className="fade">
+      <div className="dhead"><div><div className="dh-title">Аналитика</div><div className="dh-sub">Статистика по вашим местам</div></div></div>
+      <div style={{marginBottom:28}}>
+        <Chips items={OWNED.map(o=>o.name)} value={p.name} onChange={n=>setSel(OWNED.findIndex(o=>o.name===n))}/>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:16,marginBottom:24}}>
+        {[{l:'Всего штампов',v:p.n},{l:'Сегодня',v:12},{l:'За неделю',v:165},{l:'Уникальных гостей',v:284}].map(s=>(
+          <div key={s.l} className="dstat"><div className="dstat-val">{s.v}</div><div className="dstat-lbl">{s.l}</div></div>
+        ))}
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'1.4fr 1fr',gap:24,alignItems:'start'}} className="danalytics-grid">
+        {/* Chart */}
+        <div className="dpanel" style={{padding:28}}>
+          <div style={{fontSize:16,fontWeight:600,color:DK,marginBottom:4}}>Активность за неделю</div>
+          <div style={{fontSize:13,color:MU,marginBottom:28}}>Штампов в день</div>
+          <div style={{display:'flex',alignItems:'flex-end',gap:14,height:200}}>
+            {BARS.map((b,i)=>(
+              <div key={b.d} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:10,height:'100%',justifyContent:'flex-end'}}>
+                <div style={{fontSize:13,fontWeight:600,color:i===5?p.color:MU}}>{b.v}</div>
+                <div style={{width:'100%',borderRadius:'6px 6px 0 0',background:i===5?p.color:p.color+'44',height:(b.v/mx*100)+'%',minHeight:6,transition:'height .3s'}}/>
+                <span style={{fontSize:13,color:MU}}>{b.d}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        {/* Recent */}
+        <div className="dpanel" style={{padding:'28px 0 8px'}}>
+          <div style={{fontSize:16,fontWeight:600,color:DK,padding:'0 28px',marginBottom:18}}>Последние штампы</div>
+          {RECENT.map((r,i)=>(
+            <div key={i} style={{display:'flex',alignItems:'center',gap:14,padding:'12px 28px',borderTop:i?'1px solid '+BD:'none'}}>
+              <div style={{width:36,height:36,borderRadius:'50%',background:p.color+'1f',display:'flex',alignItems:'center',justifyContent:'center',fontSize:14,fontWeight:700,color:p.color,flexShrink:0}}>{r.u[1].toUpperCase()}</div>
+              <div style={{flex:1,fontSize:15,fontWeight:500,color:DK}}>{r.u}</div>
+              <span style={{fontSize:13,color:ML,whiteSpace:'nowrap'}}>{r.t}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </Page>;
+}
+
+Object.assign(window,{
+  DAuth,DPlaces,DPlace,DConfirm,DCollection,DCard,DProfile,
+  DDashboard,DAdd,DEdit,DDesign,DQR,DAnalytics,
+});
+
+
+
+
+
+// ── Standalone navigation ──
+const NAV={auth:'01-Auth.html',places:'02-Places.html',place:'03-Place.html',confirm:'04-Confirm.html',collection:'05-Collection.html',card:'06-Card.html',profile:'07-Profile.html',dashboard:'08-Dashboard.html',add:'09-AddPlace.html',design:'10-StampDesign.html',qr:'11-QRCode.html',analytics:'12-Analytics.html',edit:'13-EditPlace.html'};
+function go(page,extra){ if(NAV[page]) window.location.href=NAV[page]; }
+function App(){ return <DCollection go={go}/>; }
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+
+</script>
+</body>
+</html>
